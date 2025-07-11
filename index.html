@@ -245,21 +245,16 @@
             background-color: var(--secondary-color);
         }
         
-        /* حالة الاتصال */
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-left: 8px;
+        /* زر فلترة المفضلة */
+        .filter-favorites {
+            background-color: #fdcb6e;
+            color: #2d3436;
+            margin-left: 10px;
         }
         
-        .status-online {
-            background-color: #00b894;
-        }
-        
-        .status-offline {
-            background-color: #d63031;
+        .filter-favorites.active {
+            background-color: #e17055;
+            color: white;
         }
         
         @media (max-width: 768px) {
@@ -292,6 +287,7 @@
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="اكتب اسم الفيلم أو المسلسل..." autofocus>
         <button onclick="search()">بحث</button>
+        <button id="filterFavoritesBtn" class="filter-favorites" onclick="toggleFavoritesFilter()">عرض المفضلة فقط</button>
         
         <div class="quality-filters">
             <div class="quality-filter" onclick="addToSearch('REMUX')">REMUX</div>
@@ -344,7 +340,8 @@
                 name: "YTS", 
                 url: "https://yts.mx/browse-movies/{query}/all/all/0/latest",
                 category: "أفلام صغيرة الحجم",
-                rating: 4
+                rating: 4,
+                specialEncoding: true // هذا هو السطر المضاف
             },
             { 
                 name: "Rutracker", 
@@ -357,6 +354,18 @@
                 url: "https://nyaa.si/?q={query}",
                 category: "أنمي/ياباني",
                 rating: 5
+            },
+            { 
+                name: "BTDig", 
+                url: "https://btdig.com/search?q={query}",
+                category: "محرك بحث DHT",
+                rating: 4
+            },
+            { 
+                name: "LimeTorrents", 
+                url: "https://www.limetorrents.to/search/all/{query}/",
+                category: "عام",
+                rating: 4
             }
         ];
 
@@ -364,6 +373,7 @@
         let userFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
         let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
         let currentResults = [];
+        let showOnlyFavorites = false;
 
         // تبديل الوضع الليلي/النهاري
         function toggleTheme() {
@@ -380,18 +390,6 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
-        }
-        
-        // التحقق من اتصال الموقع
-        async function checkSiteStatus(url) {
-            try {
-                // نستخدم رابط الموقع الأساسي للتحقق بدلاً من رابط البحث
-                const baseUrl = url.split('/').slice(0, 3).join('/');
-                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(baseUrl)}`);
-                return response.ok;
-            } catch (error) {
-                return false;
-            }
         }
         
         // إضافة نص للبحث
@@ -431,20 +429,24 @@
             performSearch(query);
         }
         
-        // تنفيذ البحث الفعلي
-        async function performSearch(query) {
+        // تنفيذ البحث الفعلي (تم التعديل هنا)
+        function performSearch(query) {
             const encodedQuery = encodeURIComponent(query).replace(/%20/g, "+");
             
             let resultHTML = `<h2>نتائج البحث عن: "${query}"</h2>`;
             
-            currentResults = [];
-            
-            for (const site of sites) {
+            currentResults = sites.map(site => {
                 const isFavorite = userFavorites.includes(site.name);
-                const siteUrl = site.url.replace('{query}', encodedQuery);
-                const isOnline = await checkSiteStatus(site.url);
+                let siteUrl;
                 
-                const resultItem = {
+                // معالجة خاصة لموقع YTS
+                if (site.name === "YTS" && site.specialEncoding) {
+                    siteUrl = site.url.replace('{query}', query.replace(/\s+/g, '-').toLowerCase());
+                } else {
+                    siteUrl = site.url.replace('{query}', encodedQuery);
+                }
+                
+                return {
                     html: `
                     <div class="result-item">
                         <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
@@ -452,7 +454,6 @@
                             ${isFavorite ? '★' : '☆'}
                         </button>
                         <div class="site-name">${site.name} 
-                            <span class="status-indicator ${isOnline ? 'status-online' : 'status-offline'}"></span>
                             <span class="site-category">(${site.category})</span>
                             <span class="site-rating">${'★'.repeat(site.rating)}${'☆'.repeat(5 - site.rating)}</span>
                         </div>
@@ -460,18 +461,51 @@
                     </div>`,
                     name: site.name,
                     category: site.category,
-                    rating: site.rating
+                    rating: site.rating,
+                    isFavorite: isFavorite
                 };
-                
-                currentResults.push(resultItem);
-            }
+            });
             
-            document.getElementById("results").innerHTML = currentResults.map(r => r.html).join('');
+            displayResults();
             document.getElementById("sortOptions").classList.remove("hidden");
             updateFavoritesBar();
             
-            // حفظ آخر بحث
             localStorage.setItem('lastSearch', query);
+        }
+        
+        // عرض النتائج مع تطبيق الفلترة
+        function displayResults() {
+            const resultsContainer = document.getElementById("results");
+            
+            if (showOnlyFavorites) {
+                const filteredResults = currentResults.filter(result => result.isFavorite);
+                if (filteredResults.length === 0) {
+                    resultsContainer.innerHTML = "<p>لا توجد مواقع مفضلة لعرضها. قم بإضافة بعض المواقع إلى المفضلة أولاً.</p>";
+                } else {
+                    resultsContainer.innerHTML = currentResults[0].html.includes('<h2>') ? 
+                        currentResults[0].html.split('<h2>')[0] + '<h2>' + currentResults[0].html.split('<h2>')[1].split('</h2>')[0] + ' (المفضلة فقط)</h2>' + 
+                        filteredResults.map(r => r.html).join('') : 
+                        '<h2>النتائج (المفضلة فقط)</h2>' + filteredResults.map(r => r.html).join('');
+                }
+            } else {
+                resultsContainer.innerHTML = currentResults.map(r => r.html).join('');
+            }
+        }
+        
+        // تبديل فلترة المفضلة
+        function toggleFavoritesFilter() {
+            const filterBtn = document.getElementById('filterFavoritesBtn');
+            showOnlyFavorites = !showOnlyFavorites;
+            
+            if (showOnlyFavorites) {
+                filterBtn.textContent = 'عرض جميع النتائج';
+                filterBtn.classList.add('active');
+            } else {
+                filterBtn.textContent = 'عرض المفضلة فقط';
+                filterBtn.classList.remove('active');
+            }
+            
+            displayResults();
         }
         
         // ترتيب النتائج
@@ -495,7 +529,8 @@
                     break;
             }
             
-            document.getElementById("results").innerHTML = sortedResults.map(r => r.html).join('');
+            currentResults = sortedResults;
+            displayResults();
         }
         
         // إدارة المفضلة
@@ -511,6 +546,18 @@
             
             localStorage.setItem('favorites', JSON.stringify(userFavorites));
             updateFavoritesBar();
+            
+            // تحديث حالة المفضلة في currentResults
+            currentResults.forEach(result => {
+                if (result.name === siteName) {
+                    result.isFavorite = !result.isFavorite;
+                }
+            });
+            
+            // إذا كان فلتر المفضلة مفعل، قم بتحديث العرض
+            if (showOnlyFavorites) {
+                displayResults();
+            }
             
             // تحديث الأزرار
             const buttons = document.querySelectorAll('.favorite-btn');
@@ -581,6 +628,18 @@
             localStorage.setItem('favorites', JSON.stringify(userFavorites));
             updateFavoritesBar();
             showNotification(`تمت إزالة ${siteName} من المفضلة`);
+            
+            // تحديث حالة المفضلة في currentResults
+            currentResults.forEach(result => {
+                if (result.name === siteName) {
+                    result.isFavorite = false;
+                }
+            });
+            
+            // إذا كان فلتر المفضلة مفعل، قم بتحديث العرض
+            if (showOnlyFavorites) {
+                displayResults();
+            }
             
             // تحديث الأزرار في النتائج
             const buttons = document.querySelectorAll('.favorite-btn');
