@@ -2,598 +2,595 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>REMUX Search Hub - النسخة المتقدمة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REMUX Search Hub - البحث السريع</title>
     <style>
         :root {
-            --primary: #00b894;
-            --secondary: #6c5ce7;
-            --dark: #111;
-            --dark-gray: #1e1e1e;
-            --medium-gray: #222;
-            --light-gray: #333;
-            --text: #eee;
-            --accent: #81ecec;
-            --yellow: #fdcb6e;
-            --red: #ff7675;
-            --green: #55efc4;
+            --primary-color: #00b894;
+            --secondary-color: #6c5ce7;
+            --accent-color: #81ecec;
+            --dark-bg: #111;
+            --card-bg: #1e1e1e;
+            --text-color: #eee;
+            --light-text: #b2bec3;
         }
+        
         body {
             font-family: Arial, sans-serif;
-            background-color: var(--dark);
-            color: var(--text);
+            background-color: var(--dark-bg);
+            color: var(--text-color);
             text-align: center;
             padding: 20px;
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
+            transition: all 0.3s;
         }
+        
+        body.light-mode {
+            --dark-bg: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-color: #2d3436;
+            --light-text: #636e72;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+        }
+        
         .search-container {
-            background-color: var(--medium-gray);
+            background-color: var(--card-bg);
             padding: 25px;
             border-radius: 10px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        
         input[type="text"] {
             padding: 12px;
             width: 70%;
             font-size: 16px;
             border-radius: 5px;
-            border: none;
+            border: 1px solid #555;
             margin: 10px 0;
-            background-color: var(--light-gray);
-            color: var(--text);
+            background-color: var(--card-bg);
+            color: var(--text-color);
         }
+        
         button {
             padding: 12px 25px;
             font-size: 16px;
             border-radius: 5px;
             border: none;
-            background-color: var(--primary);
+            background-color: var(--primary-color);
             color: white;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
             margin: 10px 5px;
         }
+        
         button:hover {
             opacity: 0.9;
             transform: translateY(-2px);
         }
-        .filters-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            background-color: var(--dark-gray);
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .filter-group {
-            text-align: right;
-        }
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--accent);
-            font-size: 14px;
-        }
-        .filter-group select, .filter-group input {
-            padding: 8px 12px;
-            border-radius: 5px;
-            border: none;
-            background-color: var(--light-gray);
-            color: var(--text);
-        }
+        
         .results {
             margin-top: 30px;
             text-align: right;
         }
+        
         .result-item {
-            background-color: var(--dark-gray);
-            padding: 20px;
+            background-color: var(--card-bg);
+            padding: 15px;
             margin: 15px 0;
             border-radius: 8px;
             transition: all 0.3s;
             position: relative;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        
         .result-item:hover {
             transform: translateX(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        .site-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+        
         .site-name {
-            color: var(--primary);
+            color: var(--primary-color);
             font-weight: bold;
             font-size: 18px;
         }
-        .site-status {
-            font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 10px;
-            background-color: var(--light-gray);
-        }
-        .online {
-            color: var(--green);
-        }
-        .offline {
-            color: var(--red);
-        }
+        
         .result-link {
-            color: var(--accent);
+            color: var(--accent-color);
             text-decoration: none;
             display: block;
             margin-top: 8px;
             word-break: break-all;
         }
-        .rating {
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        .stars {
-            color: var(--yellow);
-            font-size: 18px;
-        }
-        .rating-count {
-            color: #b2bec3;
-            font-size: 14px;
-        }
-        .rate-btn {
-            background: none;
-            border: none;
-            color: var(--accent);
-            cursor: pointer;
-            font-size: 12px;
-            padding: 2px 5px;
-        }
-        .rate-btn:hover {
-            text-decoration: underline;
-        }
-        .rating-form {
-            display: none;
-            background: var(--light-gray);
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        .rating-form.active {
-            display: block;
-        }
-        .site-stats {
-            display: flex;
-            gap: 10px;
-            font-size: 13px;
-            color: #b2bec3;
-            margin-top: 5px;
-        }
-        .stat {
-            display: flex;
-            align-items: center;
-        }
-        .suggestions {
-            margin: 10px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-        .suggestion {
-            background-color: var(--light-gray);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .suggestion:hover {
-            background-color: var(--primary);
-            color: white;
-        }
-        .favorites-bar {
-            margin: 15px 0;
-            text-align: left;
-        }
-        .favorite-btn {
-            background-color: var(--secondary);
-            padding: 8px 15px;
-            font-size: 14px;
-        }
-        .favorite-item {
-            background-color: rgba(108, 92, 231, 0.2);
-            border-left: 3px solid var(--secondary);
-        }
+        
         .hidden {
             display: none;
         }
-        .favorites-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+        
+        .site-category {
+            color: #fdcb6e;
+            font-size: 14px;
+            margin-top: 5px;
         }
+        
+        /* أنماط المفضلة */
+        .favorite-btn {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            background: none;
+            border: none;
+            color: var(--light-text);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .favorite-btn.active {
+            color: #fdcb6e;
+        }
+        
+        .favorites-bar {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: right;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
         .favorite-tag {
-            background-color: var(--secondary);
+            display: inline-block;
+            background-color: var(--secondary-color);
             color: white;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 14px;
+            transition: all 0.2s;
         }
+        
+        .favorite-tag:hover {
+            transform: scale(1.05);
+        }
+        
         .favorite-tag button {
             background: none;
             border: none;
             color: white;
-            margin-left: 5px;
+            margin-right: 5px;
             padding: 0;
-            font-size: 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* أنماط جديدة */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--secondary-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+        
+        .search-history {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: right;
+        }
+        
+        .history-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #333;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .sort-options {
+            margin: 15px 0;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            transform: translateX(200%);
+            transition: transform 0.3s;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .quality-filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .quality-filter {
+            padding: 8px 15px;
+            background-color: #333;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .quality-filter:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        @media (max-width: 768px) {
+            input[type="text"] {
+                width: 100%;
+            }
+            
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .quality-filters {
+                gap: 5px;
+            }
+            
+            .quality-filter {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>REMUX Search Hub 🎬 <span style="font-size: 16px; color: var(--accent);">(النسخة المتقدمة)</span></h1>
+    <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
+    <div class="notification" id="notification"></div>
+    
+    <h1>REMUX Search Hub 🎬 <span style="font-size: 16px; color: var(--accent-color);">(إصدار محسن للجودة)</span></h1>
     
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="اكتب اسم الفيلم أو المسلسل..." autofocus>
-        <button onclick="search()">ابحث</button>
+        <button onclick="search()">بحث</button>
         
-        <div class="suggestions" id="suggestions">
-            <span>اقتراحات: </span>
-            <span class="suggestion" onclick="applySuggestion('1080p')">1080p</span>
-            <span class="suggestion" onclick="applySuggestion('2160p')">2160p</span>
-            <span class="suggestion" onclick="applySuggestion('REMUX')">REMUX</span>
-            <span class="suggestion" onclick="applySuggestion('BluRay')">BluRay</span>
-            <span class="suggestion" onclick="applySuggestion('Dual Audio')">Dual Audio</span>
+        <div class="quality-filters">
+            <div class="quality-filter" onclick="addToSearch('REMUX')">REMUX</div>
+            <div class="quality-filter" onclick="addToSearch('BluRay')">BluRay</div>
+            <div class="quality-filter" onclick="addToSearch('WEBRip')">WEBRip</div>
+            <div class="quality-filter" onclick="addToSearch('WEBDL')">WEBDL</div>
+            <div class="quality-filter" onclick="addToSearch('2160p')">2160p</div>
+            <div class="quality-filter" onclick="addToSearch('1080p')">1080p</div>
         </div>
     </div>
 
-    <div class="filters-container">
-        <div class="filter-group">
-            <label>تصفية حسب التقييم</label>
-            <select id="ratingFilter" onchange="filterByRating()">
-                <option value="0">الكل</option>
-                <option value="4">⭐ 4+ نجوم</option>
-                <option value="3">⭐ 3+ نجوم</option>
-            </select>
-        </div>
-        
-        <div class="filter-group">
-            <label>ترتيب حسب</label>
-            <select id="sortBy" onchange="sortResults()">
-                <option value="default">الإفتراضي</option>
-                <option value="rating">الأعلى تقييماً</option>
-                <option value="name">حسب الاسم (أ-ي)</option>
-            </select>
-        </div>
+    <div id="searchHistory" class="search-history hidden">
+        <h3>عمليات البحث السابقة:</h3>
+        <div id="historyList"></div>
     </div>
 
-    <div class="favorites-bar">
-        <button class="favorite-btn" onclick="toggleFavorites()">★ المواقع المفضلة</button>
-        <div id="favorites-list" class="hidden favorites-list"></div>
+    <div id="favoritesBar" class="favorites-bar hidden">
+        <h3>المواقع المفضلة:</h3>
+        <div id="favoritesList"></div>
+    </div>
+
+    <div class="sort-options hidden" id="sortOptions">
+        <label>ترتيب النتائج:</label>
+        <select id="sortBy" onchange="sortResults()">
+            <option value="default">الافتراضي</option>
+            <option value="name">حسب الاسم (أ-ي)</option>
+            <option value="category">حسب التصنيف</option>
+            <option value="rating">حسب التقييم</option>
+        </select>
     </div>
 
     <div class="results" id="results"></div>
 
     <script>
-        // بيانات التطبيق
-        const siteData = {
-            "1337x": { 
+        // بيانات المواقع
+        const sites = [
+            { 
+                name: "1337x", 
                 url: "https://1337x.to/search/{query}/1/",
-                rating: 4.2, 
-                ratingCount: 128,
-                speed: "2.4MB/s" 
+                category: "عام",
+                rating: 4
             },
-            "TorrentGalaxy": { 
+            { 
+                name: "TorrentGalaxy", 
                 url: "https://torrentgalaxy.to/torrents.php?search={query}",
-                rating: 3.8, 
-                ratingCount: 95,
-                speed: "1.8MB/s" 
+                category: "عام",
+                rating: 4
             },
-            "SolidTorrents": { 
+            { 
+                name: "SolidTorrents", 
                 url: "https://solidtorrents.net/search?q={query}",
-                rating: 3.5, 
-                ratingCount: 76,
-                speed: "1.5MB/s" 
+                category: "عام",
+                rating: 3
             },
-            "Torlock": { 
-                url: "https://www.torlock.com/all/torrents/{query}.html",
-                rating: 3.2, 
-                ratingCount: 64,
-                speed: "1.2MB/s" 
-            },
-            "Snowfl": { 
-                url: "https://snowfl.com/search?q={query}",
-                rating: 3.0, 
-                ratingCount: 42,
-                speed: "1.0MB/s" 
-            },
-            "RARBG Mirror": { 
+            { 
+                name: "RARBG Mirror", 
                 url: "https://rargb.to/search/?search={query}",
-                rating: 4.5, 
-                ratingCount: 210,
-                speed: "3.1MB/s" 
+                category: "عام",
+                rating: 5
             },
-            "Knaben": { 
-                url: "https://knaben.org/?q={query}",
-                rating: 2.8, 
-                ratingCount: 38,
-                speed: "0.9MB/s" 
-            },
-            "BTDig": { 
-                url: "https://btdig.com/search?q={query}",
-                rating: 3.7, 
-                ratingCount: 87,
-                speed: "1.6MB/s" 
-            },
-            "YTS": { 
+            { 
+                name: "YTS", 
                 url: "https://yts.mx/browse-movies/{query}/all/all/0/latest",
-                rating: 4.1, 
-                ratingCount: 182,
-                speed: "2.8MB/s" 
+                category: "أفلام صغيرة الحجم",
+                rating: 4
             },
-            "Rutracker": { 
+            { 
+                name: "Rutracker", 
                 url: "https://rutracker.org/forum/tracker.php?nm={query}",
-                rating: 4.3, 
-                ratingCount: 156,
-                speed: "2.5MB/s" 
+                category: "محتوى روسي/عالمي",
+                rating: 4
             },
-            "Nyaa": { 
+            { 
+                name: "Nyaa", 
                 url: "https://nyaa.si/?q={query}",
-                rating: 4.7, 
-                ratingCount: 203,
-                speed: "3.5MB/s" 
+                category: "أنمي/ياباني",
+                rating: 5
             }
-        };
+        ];
 
         // بيانات المستخدم
-        let userData = JSON.parse(localStorage.getItem('userData')) || {
-            ratings: {},
-            favorites: [],
-            searchHistory: []
-        };
+        let userFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        let currentResults = [];
 
-        // تحميل الصفحة
-        window.onload = function() {
-            loadFavorites();
-            const lastSearch = localStorage.getItem('lastSearch');
-            if (lastSearch) {
-                document.getElementById("searchInput").value = lastSearch;
-            }
-        };
-
-        // عرض النجوم
-        function renderStars(rating) {
-            const fullStars = Math.floor(rating);
-            const halfStar = rating % 1 >= 0.5 ? 1 : 0;
-            const emptyStars = 5 - fullStars - halfStar;
-            
-            let stars = '';
-            for (let i = 0; i < fullStars; i++) stars += '★';
-            if (halfStar) stars += '½';
-            for (let i = 0; i < emptyStars; i++) stars += '☆';
-            
-            return stars;
+        // تبديل الوضع الليلي/النهاري
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
         }
 
-        // البحث
+        // إظهار الإشعارات
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // إضافة نص للبحث
+        function addToSearch(text) {
+            const searchInput = document.getElementById('searchInput');
+            const currentValue = searchInput.value.trim();
+            
+            // إذا كان النص موجود بالفعل، نزيله، وإلا نضيفه
+            if (currentValue.includes(text)) {
+                searchInput.value = currentValue.replace(text, '').trim();
+            } else {
+                searchInput.value = currentValue ? `${currentValue} ${text}` : text;
+            }
+            
+            // تنفيذ البحث تلقائياً إذا كان هناك نص في مربع البحث
+            if (searchInput.value.trim()) {
+                search();
+            }
+        }
+        
+        // البحث السريع
         function search() {
             const query = document.getElementById("searchInput").value.trim();
             if (!query) {
-                alert("الرجاء إدخال كلمة البحث");
+                showNotification("الرجاء إدخال كلمة البحث");
                 return;
             }
             
-            // حفظ تاريخ البحث
-            if (!userData.searchHistory.includes(query)) {
-                userData.searchHistory.push(query);
-                localStorage.setItem('userData', JSON.stringify(userData));
+            // حفظ في سجل البحث
+            if (!searchHistory.includes(query)) {
+                searchHistory.unshift(query);
+                if (searchHistory.length > 10) searchHistory.pop();
+                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+                updateSearchHistory();
             }
             
-            localStorage.setItem('lastSearch', query);
             performSearch(query);
         }
-
-        // تنفيذ البحث
+        
+        // تنفيذ البحث الفعلي
         function performSearch(query) {
             const encodedQuery = encodeURIComponent(query).replace(/%20/g, "+");
             
-            let resultHTML = "<h2>نتائج البحث:</h2>";
+            let resultHTML = `<h2>نتائج البحث عن: "${query}"</h2>`;
             
-            Object.entries(siteData).forEach(([siteName, data]) => {
-                const url = data.url.replace('{query}', encodedQuery);
-                const isFavorite = userData.favorites.includes(siteName);
+            currentResults = sites.map(site => {
+                const isFavorite = userFavorites.includes(site.name);
+                const siteUrl = site.url.replace('{query}', encodedQuery);
                 
-                // حساب التقييم النهائي
-                const userRating = userData.ratings[siteName] || 0;
-                const totalRatings = data.ratingCount + (userRating ? 1 : 0);
-                const totalScore = (data.rating * data.ratingCount) + (userRating || 0);
-                const finalRating = totalRatings > 0 ? (totalScore / totalRatings) : 0;
-                
-                resultHTML += `
-                <div class="result-item ${isFavorite ? 'favorite-item' : ''}" 
-                     data-rating="${finalRating.toFixed(1)}" 
-                     data-name="${siteName}"
-                     data-speed="${parseFloat(data.speed)}">
-                    <div class="site-header">
-                        <div class="site-name">${siteName} 
-                            <span class="site-status" id="status-${siteName}">جاري التحقق...</span>
-                        </div>
-                        <button class="favorite-toggle" onclick="toggleFavorite('${siteName}')">
+                return {
+                    html: `
+                    <div class="result-item">
+                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
+                                onclick="toggleFavorite('${site.name}')">
                             ${isFavorite ? '★' : '☆'}
                         </button>
-                    </div>
-                    <div class="rating">
-                        <span class="stars">${renderStars(finalRating)}</span>
-                        <span class="rating-count">(${finalRating.toFixed(1)}/5 - ${totalRatings} تقييمات)</span>
-                        <button class="rate-btn" onclick="showRatingForm('${siteName}')">قيم هذا الموقع</button>
-                    </div>
-                    <div id="rating-form-${siteName}" class="rating-form">
-                        <small>اختر تقييمك:</small>
-                        <select id="user-rating-${siteName}">
-                            <option value="5">5 ★★★★★</option>
-                            <option value="4">4 ★★★★☆</option>
-                            <option value="3">3 ★★★☆☆</option>
-                            <option value="2">2 ★★☆☆☆</option>
-                            <option value="1">1 ★☆☆☆☆</option>
-                        </select>
-                        <button onclick="submitRating('${siteName}')">حفظ</button>
-                    </div>
-                    <div class="site-stats">
-                        <div class="stat">⏱️ ${data.speed}</div>
-                        <div class="stat">📊 ~${Math.floor(data.ratingCount * 1.5)} نتيجة</div>
-                    </div>
-                    <a href="${url}" class="result-link" target="_blank">${query}</a>
-                </div>`;
+                        <div class="site-name">${site.name} 
+                            <span class="site-category">(${site.category})</span>
+                            <span class="site-rating">${'★'.repeat(site.rating)}${'☆'.repeat(5 - site.rating)}</span>
+                        </div>
+                        <a href="${siteUrl}" class="result-link" target="_blank">${query}</a>
+                    </div>`,
+                    name: site.name,
+                    category: site.category,
+                    rating: site.rating
+                };
             });
             
-            document.getElementById("results").innerHTML = resultHTML;
+            document.getElementById("results").innerHTML = currentResults.map(r => r.html).join('');
+            document.getElementById("sortOptions").classList.remove("hidden");
+            updateFavoritesBar();
             
-            // التحقق من حالة المواقع
-            Object.keys(siteData).forEach(siteName => {
-                checkSiteStatus(siteName, siteData[siteName].url.replace('{query}', 'test'));
-            });
-            
-            // تطبيق الفلاتر الحالية
-            filterByRating();
+            // حفظ آخر بحث
+            localStorage.setItem('lastSearch', query);
         }
-
-        // التحقق من حالة الموقع
-        async function checkSiteStatus(siteName, baseUrl) {
-            const statusElement = document.getElementById(`status-${siteName}`);
-            try {
-                // استخدام خدمة CORS proxy للتحقق من حالة الموقع
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(baseUrl)}`;
-                const response = await fetch(proxyUrl);
-                
-                if (response.ok) {
-                    statusElement.textContent = "🟢 متصل";
-                    statusElement.classList.add("online");
-                } else {
-                    statusElement.textContent = "🔴 غير متصل";
-                    statusElement.classList.add("offline");
-                }
-            } catch (error) {
-                statusElement.textContent = "🔴 غير متصل";
-                statusElement.classList.add("offline");
-            }
-        }
-
-        // تصفية حسب التقييم
-        function filterByRating() {
-            const minRating = parseFloat(document.getElementById("ratingFilter").value);
-            const items = document.querySelectorAll(".result-item");
-            
-            items.forEach(item => {
-                const itemRating = parseFloat(item.getAttribute("data-rating"));
-                item.style.display = itemRating >= minRating ? "block" : "none";
-            });
-        }
-
+        
         // ترتيب النتائج
         function sortResults() {
             const sortBy = document.getElementById("sortBy").value;
-            const container = document.getElementById("results");
-            const items = Array.from(document.querySelectorAll(".result-item"));
             
-            items.sort((a, b) => {
-                if (sortBy === "rating") {
-                    return parseFloat(b.getAttribute("data-rating")) - parseFloat(a.getAttribute("data-rating"));
-                } else if (sortBy === "name") {
-                    return a.getAttribute("data-name").localeCompare(b.getAttribute("data-name"));
-                }
-                return 0;
-            });
+            let sortedResults = [...currentResults];
             
-            items.forEach(item => container.appendChild(item));
+            switch(sortBy) {
+                case 'name':
+                    sortedResults.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'category':
+                    sortedResults.sort((a, b) => a.category.localeCompare(b.category));
+                    break;
+                case 'rating':
+                    sortedResults.sort((a, b) => b.rating - a.rating);
+                    break;
+                default:
+                    // الترتيب الافتراضي
+                    break;
+            }
+            
+            document.getElementById("results").innerHTML = sortedResults.map(r => r.html).join('');
         }
-
+        
         // إدارة المفضلة
         function toggleFavorite(siteName) {
-            const index = userData.favorites.indexOf(siteName);
+            const index = userFavorites.indexOf(siteName);
             if (index === -1) {
-                userData.favorites.push(siteName);
+                userFavorites.push(siteName);
+                showNotification(`تمت إضافة ${siteName} إلى المفضلة`);
             } else {
-                userData.favorites.splice(index, 1);
+                userFavorites.splice(index, 1);
+                showNotification(`تمت إزالة ${siteName} من المفضلة`);
             }
             
-            localStorage.setItem('userData', JSON.stringify(userData));
-            document.querySelector(`.result-item[data-name="${siteName}"]`).classList.toggle('favorite-item');
-            loadFavorites();
-        }
-
-        function loadFavorites() {
-            const favoritesList = document.getElementById("favorites-list");
-            favoritesList.innerHTML = '';
+            localStorage.setItem('favorites', JSON.stringify(userFavorites));
+            updateFavoritesBar();
             
-            userData.favorites.forEach(siteName => {
-                const favElement = document.createElement('div');
-                favElement.className = 'favorite-tag';
-                favElement.innerHTML = `
-                    ${siteName}
-                    <button onclick="removeFavorite('${siteName}')">✕</button>
-                `;
-                favoritesList.appendChild(favElement);
+            // تحديث الأزرار
+            const buttons = document.querySelectorAll('.favorite-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes('★') || btn.textContent.includes('☆')) {
+                    const btnSiteName = btn.getAttribute('onclick').replace("toggleFavorite('", "").replace("')", "");
+                    if (btnSiteName === siteName) {
+                        btn.classList.toggle('active');
+                        btn.innerHTML = userFavorites.includes(siteName) ? '★' : '☆';
+                    }
+                }
             });
         }
-
+        
+        // تحديث شريط المفضلة
+        function updateFavoritesBar() {
+            const favoritesBar = document.getElementById("favoritesBar");
+            const favoritesList = document.getElementById("favoritesList");
+            
+            if (userFavorites.length > 0) {
+                favoritesBar.classList.remove("hidden");
+                favoritesList.innerHTML = '';
+                
+                userFavorites.forEach(siteName => {
+                    const site = sites.find(s => s.name === siteName);
+                    if (site) {
+                        const favElement = document.createElement('div');
+                        favElement.className = 'favorite-tag';
+                        favElement.innerHTML = `
+                            ${siteName}
+                            <button onclick="removeFavorite('${siteName}')">✕</button>
+                        `;
+                        favoritesList.appendChild(favElement);
+                    }
+                });
+            } else {
+                favoritesBar.classList.add("hidden");
+            }
+        }
+        
+        // تحديث سجل البحث
+        function updateSearchHistory() {
+            const historyContainer = document.getElementById("searchHistory");
+            const historyList = document.getElementById("historyList");
+            
+            if (searchHistory.length > 0) {
+                historyContainer.classList.remove("hidden");
+                historyList.innerHTML = '';
+                
+                searchHistory.forEach(query => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.textContent = query;
+                    historyItem.onclick = () => {
+                        document.getElementById("searchInput").value = query;
+                        search();
+                    };
+                    historyList.appendChild(historyItem);
+                });
+            } else {
+                historyContainer.classList.add("hidden");
+            }
+        }
+        
+        // إزالة من المفضلة
         function removeFavorite(siteName) {
-            userData.favorites = userData.favorites.filter(name => name !== siteName);
-            localStorage.setItem('userData', JSON.stringify(userData));
-            loadFavorites();
-            document.querySelector(`.result-item[data-name="${siteName}"]`).classList.remove('favorite-item');
-        }
-
-        function toggleFavorites() {
-            document.getElementById("favorites-list").classList.toggle("hidden");
-        }
-
-        // نظام التقييم
-        function showRatingForm(siteName) {
-            document.querySelectorAll(".rating-form").forEach(form => {
-                form.classList.remove("active");
+            userFavorites = userFavorites.filter(name => name !== siteName);
+            localStorage.setItem('favorites', JSON.stringify(userFavorites));
+            updateFavoritesBar();
+            showNotification(`تمت إزالة ${siteName} من المفضلة`);
+            
+            // تحديث الأزرار في النتائج
+            const buttons = document.querySelectorAll('.favorite-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('onclick') === `toggleFavorite('${siteName}')`) {
+                    btn.classList.remove('active');
+                    btn.innerHTML = '☆';
+                }
             });
-            const form = document.getElementById(`rating-form-${siteName}`);
-            form.classList.add("active");
-            
-            if (userData.ratings[siteName]) {
-                document.getElementById(`user-rating-${siteName}`).value = userData.ratings[siteName];
-            }
         }
-
-        function submitRating(siteName) {
-            const rating = parseInt(document.getElementById(`user-rating-${siteName}`).value);
-            userData.ratings[siteName] = rating;
-            localStorage.setItem('userData', JSON.stringify(userData));
-            
-            alert(`تم حفظ تقييمك ${rating} نجوم لموقع ${siteName}`);
-            document.getElementById(`rating-form-${siteName}`).classList.remove("active");
-            
-            // إعادة تحميل النتائج لتحديث التقييمات
-            search();
-        }
-
-        // الاقتراحات
-        function applySuggestion(text) {
-            const input = document.getElementById("searchInput");
-            input.value = input.value ? `${input.value} ${text}` : text;
-            input.focus();
-        }
-
+        
         // البحث بالضغط على Enter
         document.getElementById("searchInput").addEventListener("keyup", function(event) {
             if (event.key === "Enter") {
                 search();
             }
         });
+        
+        // تحميل المفضلة عند البدء
+        window.onload = function() {
+            // تحميل الوضع المفضل
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+            
+            updateFavoritesBar();
+            updateSearchHistory();
+            
+            const lastSearch = localStorage.getItem('lastSearch');
+            if (lastSearch) {
+                document.getElementById("searchInput").value = lastSearch;
+            }
+        };
     </script>
 </body>
 </html>
