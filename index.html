@@ -245,6 +245,23 @@
             background-color: var(--secondary-color);
         }
         
+        /* حالة الاتصال */
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        
+        .status-online {
+            background-color: #00b894;
+        }
+        
+        .status-offline {
+            background-color: #d63031;
+        }
+        
         @media (max-width: 768px) {
             input[type="text"] {
                 width: 100%;
@@ -318,18 +335,6 @@
                 rating: 4
             },
             { 
-                name: "TorrentGalaxy", 
-                url: "https://torrentgalaxy.to/torrents.php?search={query}",
-                category: "عام",
-                rating: 4
-            },
-            { 
-                name: "SolidTorrents", 
-                url: "https://solidtorrents.net/search?q={query}",
-                category: "عام",
-                rating: 3
-            },
-            { 
                 name: "RARBG Mirror", 
                 url: "https://rargb.to/search/?search={query}",
                 category: "عام",
@@ -377,6 +382,18 @@
             }, 3000);
         }
         
+        // التحقق من اتصال الموقع
+        async function checkSiteStatus(url) {
+            try {
+                // نستخدم رابط الموقع الأساسي للتحقق بدلاً من رابط البحث
+                const baseUrl = url.split('/').slice(0, 3).join('/');
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(baseUrl)}`);
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+        
         // إضافة نص للبحث
         function addToSearch(text) {
             const searchInput = document.getElementById('searchInput');
@@ -415,16 +432,19 @@
         }
         
         // تنفيذ البحث الفعلي
-        function performSearch(query) {
+        async function performSearch(query) {
             const encodedQuery = encodeURIComponent(query).replace(/%20/g, "+");
             
             let resultHTML = `<h2>نتائج البحث عن: "${query}"</h2>`;
             
-            currentResults = sites.map(site => {
+            currentResults = [];
+            
+            for (const site of sites) {
                 const isFavorite = userFavorites.includes(site.name);
                 const siteUrl = site.url.replace('{query}', encodedQuery);
+                const isOnline = await checkSiteStatus(site.url);
                 
-                return {
+                const resultItem = {
                     html: `
                     <div class="result-item">
                         <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
@@ -432,6 +452,7 @@
                             ${isFavorite ? '★' : '☆'}
                         </button>
                         <div class="site-name">${site.name} 
+                            <span class="status-indicator ${isOnline ? 'status-online' : 'status-offline'}"></span>
                             <span class="site-category">(${site.category})</span>
                             <span class="site-rating">${'★'.repeat(site.rating)}${'☆'.repeat(5 - site.rating)}</span>
                         </div>
@@ -441,7 +462,9 @@
                     category: site.category,
                     rating: site.rating
                 };
-            });
+                
+                currentResults.push(resultItem);
+            }
             
             document.getElementById("results").innerHTML = currentResults.map(r => r.html).join('');
             document.getElementById("sortOptions").classList.remove("hidden");
