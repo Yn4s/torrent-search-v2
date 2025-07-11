@@ -2,22 +2,36 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>REMUX Search Hub - فلاتر متقدمة</title>
+    <title>REMUX Search Hub - النسخة المتقدمة</title>
     <style>
+        :root {
+            --primary: #00b894;
+            --secondary: #6c5ce7;
+            --dark: #111;
+            --dark-gray: #1e1e1e;
+            --medium-gray: #222;
+            --light-gray: #333;
+            --text: #eee;
+            --accent: #81ecec;
+            --yellow: #fdcb6e;
+            --red: #ff7675;
+            --green: #55efc4;
+        }
         body {
             font-family: Arial, sans-serif;
-            background-color: #111;
-            color: #eee;
+            background-color: var(--dark);
+            color: var(--text);
             text-align: center;
             padding: 20px;
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         .search-container {
-            background-color: #222;
+            background-color: var(--medium-gray);
             padding: 25px;
             border-radius: 10px;
             margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
         input[type="text"] {
             padding: 12px;
@@ -26,13 +40,15 @@
             border-radius: 5px;
             border: none;
             margin: 10px 0;
+            background-color: var(--light-gray);
+            color: var(--text);
         }
         button {
             padding: 12px 25px;
             font-size: 16px;
             border-radius: 5px;
             border: none;
-            background-color: #00b894;
+            background-color: var(--primary);
             color: white;
             cursor: pointer;
             font-weight: bold;
@@ -40,16 +56,16 @@
             margin: 10px 5px;
         }
         button:hover {
-            background-color: #00997b;
+            opacity: 0.9;
             transform: translateY(-2px);
         }
-        .filters {
+        .filters-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 15px;
             margin: 20px 0;
-            background-color: #1a1a1a;
+            background-color: var(--dark-gray);
             padding: 15px;
             border-radius: 8px;
         }
@@ -59,378 +75,525 @@
         .filter-group label {
             display: block;
             margin-bottom: 5px;
-            color: #81ecec;
+            color: var(--accent);
+            font-size: 14px;
         }
         .filter-group select, .filter-group input {
             padding: 8px 12px;
             border-radius: 5px;
             border: none;
-            background-color: #333;
-            color: white;
+            background-color: var(--light-gray);
+            color: var(--text);
         }
         .results {
             margin-top: 30px;
             text-align: right;
         }
         .result-item {
-            background-color: #1e1e1e;
-            padding: 15px;
+            background-color: var(--dark-gray);
+            padding: 20px;
             margin: 15px 0;
             border-radius: 8px;
             transition: all 0.3s;
             position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .result-item:hover {
-            background-color: #2e2e2e;
             transform: translateX(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .site-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
         .site-name {
-            color: #00b894;
+            color: var(--primary);
             font-weight: bold;
+            font-size: 18px;
+        }
+        .site-status {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background-color: var(--light-gray);
+        }
+        .online {
+            color: var(--green);
+        }
+        .offline {
+            color: var(--red);
         }
         .result-link {
-            color: #81ecec;
+            color: var(--accent);
             text-decoration: none;
             display: block;
             margin-top: 8px;
+            word-break: break-all;
         }
-        .advanced-btn {
-            background-color: #6c5ce7;
+        .rating {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            flex-wrap: wrap;
+            gap: 5px;
         }
-        .advanced-btn:hover {
-            background-color: #5649c0;
+        .stars {
+            color: var(--yellow);
+            font-size: 18px;
+        }
+        .rating-count {
+            color: #b2bec3;
+            font-size: 14px;
+        }
+        .rate-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 2px 5px;
+        }
+        .rate-btn:hover {
+            text-decoration: underline;
+        }
+        .rating-form {
+            display: none;
+            background: var(--light-gray);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .rating-form.active {
+            display: block;
+        }
+        .site-stats {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+            color: #b2bec3;
+            margin-top: 5px;
+        }
+        .stat {
+            display: flex;
+            align-items: center;
+        }
+        .suggestions {
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        .suggestion {
+            background-color: var(--light-gray);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .suggestion:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        .favorites-bar {
+            margin: 15px 0;
+            text-align: left;
+        }
+        .favorite-btn {
+            background-color: var(--secondary);
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        .favorite-item {
+            background-color: rgba(108, 92, 231, 0.2);
+            border-left: 3px solid var(--secondary);
         }
         .hidden {
             display: none;
         }
-        .site-category {
-            color: #fdcb6e;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        /* أنماط جديدة للمواقع المفضلة */
-        .favorite-btn {
-            position: absolute;
-            left: 15px;
-            top: 15px;
-            background: none;
-            border: none;
-            color: #b2bec3;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        .favorite-btn.active {
-            color: #fdcb6e;
-        }
-        .favorites-bar {
-            background-color: #1a1a1a;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: right;
+        .favorites-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
         }
         .favorite-tag {
-            display: inline-block;
-            background-color: #6c5ce7;
+            background-color: var(--secondary);
             color: white;
-            padding: 5px 10px;
+            padding: 3px 8px;
             border-radius: 5px;
-            margin: 5px;
-            font-size: 14px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
         }
         .favorite-tag button {
             background: none;
             border: none;
             color: white;
-            margin-right: 5px;
+            margin-left: 5px;
             padding: 0;
-            font-size: 12px;
-            cursor: pointer;
+            font-size: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>REMUX Search Hub 🎬 <span style="font-size: 16px; color: #81ecec;">(إصدار الفلاتر المتقدمة)</span></h1>
+    <h1>REMUX Search Hub 🎬 <span style="font-size: 16px; color: var(--accent);">(النسخة المتقدمة)</span></h1>
     
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="اكتب اسم الفيلم أو المسلسل..." autofocus>
-        <button onclick="search()">بحث سريع</button>
-        <button class="advanced-btn" onclick="toggleAdvanced()">الفلاتر المتقدمة ⚙️</button>
+        <button onclick="search()">ابحث</button>
         
-        <div id="advancedFilters" class="hidden">
-            <div class="filters">
-                <div class="filter-group">
-                    <label>نوع المحتوى</label>
-                    <select id="contentType">
-                        <option value="">الكل</option>
-                        <option value="فيلم">فيلم</option>
-                        <option value="مسلسل">مسلسل</option>
-                        <option value="انمي">انمي</option>
-                        <option value="لعبة">لعبة</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>جودة الفيديو</label>
-                    <select id="quality">
-                        <option value="">الكل</option>
-                        <option value="REMUX">REMUX</option>
-                        <option value="2160p">4K (2160p)</option>
-                        <option value="1080p">Full HD (1080p)</option>
-                        <option value="720p">HD (720p)</option>
-                        <option value="BluRay">BluRay</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>سنة الإصدار</label>
-                    <input type="number" id="year" placeholder="السنة (مثال: 2023)" min="1900" max="2030">
-                </div>
-                
-                <div class="filter-group">
-                    <label>حجم الملف</label>
-                    <select id="size">
-                        <option value="">الكل</option>
-                        <option value="10GB+">كبير (10GB+)</option>
-                        <option value="5GB-10GB">متوسط (5-10GB)</option>
-                        <option value="-5GB">صغير (&lt;5GB)</option>
-                    </select>
-                </div>
-            </div>
-            
-            <button onclick="advancedSearch()">بحث متقدم</button>
-            <button onclick="resetFilters()">إعادة الضبط</button>
+        <div class="suggestions" id="suggestions">
+            <span>اقتراحات: </span>
+            <span class="suggestion" onclick="applySuggestion('1080p')">1080p</span>
+            <span class="suggestion" onclick="applySuggestion('2160p')">2160p</span>
+            <span class="suggestion" onclick="applySuggestion('REMUX')">REMUX</span>
+            <span class="suggestion" onclick="applySuggestion('BluRay')">BluRay</span>
+            <span class="suggestion" onclick="applySuggestion('Dual Audio')">Dual Audio</span>
         </div>
     </div>
 
-    <div id="favoritesBar" class="favorites-bar hidden">
-        <h3>المواقع المفضلة:</h3>
-        <div id="favoritesList"></div>
+    <div class="filters-container">
+        <div class="filter-group">
+            <label>تصفية حسب التقييم</label>
+            <select id="ratingFilter" onchange="filterByRating()">
+                <option value="0">الكل</option>
+                <option value="4">⭐ 4+ نجوم</option>
+                <option value="3">⭐ 3+ نجوم</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label>ترتيب حسب</label>
+            <select id="sortBy" onchange="sortResults()">
+                <option value="default">الإفتراضي</option>
+                <option value="rating">الأعلى تقييماً</option>
+                <option value="name">حسب الاسم (أ-ي)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="favorites-bar">
+        <button class="favorite-btn" onclick="toggleFavorites()">★ المواقع المفضلة</button>
+        <div id="favorites-list" class="hidden favorites-list"></div>
     </div>
 
     <div class="results" id="results"></div>
 
     <script>
-        // بيانات المواقع
-        const sites = [
-            { 
-                name: "1337x", 
+        // بيانات التطبيق
+        const siteData = {
+            "1337x": { 
                 url: "https://1337x.to/search/{query}/1/",
-                category: "عام"
+                rating: 4.2, 
+                ratingCount: 128,
+                speed: "2.4MB/s" 
             },
-            { 
-                name: "TorrentGalaxy", 
+            "TorrentGalaxy": { 
                 url: "https://torrentgalaxy.to/torrents.php?search={query}",
-                category: "عام"
+                rating: 3.8, 
+                ratingCount: 95,
+                speed: "1.8MB/s" 
             },
-            { 
-                name: "SolidTorrents", 
+            "SolidTorrents": { 
                 url: "https://solidtorrents.net/search?q={query}",
-                category: "عام"
+                rating: 3.5, 
+                ratingCount: 76,
+                speed: "1.5MB/s" 
             },
-            { 
-                name: "Torlock", 
+            "Torlock": { 
                 url: "https://www.torlock.com/all/torrents/{query}.html",
-                category: "عام"
+                rating: 3.2, 
+                ratingCount: 64,
+                speed: "1.2MB/s" 
             },
-            { 
-                name: "Snowfl", 
+            "Snowfl": { 
                 url: "https://snowfl.com/search?q={query}",
-                category: "عام"
+                rating: 3.0, 
+                ratingCount: 42,
+                speed: "1.0MB/s" 
             },
-            { 
-                name: "RARBG Mirror", 
+            "RARBG Mirror": { 
                 url: "https://rargb.to/search/?search={query}",
-                category: "عام"
+                rating: 4.5, 
+                ratingCount: 210,
+                speed: "3.1MB/s" 
             },
-            { 
-                name: "Knaben", 
+            "Knaben": { 
                 url: "https://knaben.org/?q={query}",
-                category: "عام"
+                rating: 2.8, 
+                ratingCount: 38,
+                speed: "0.9MB/s" 
             },
-            { 
-                name: "BTDig", 
+            "BTDig": { 
                 url: "https://btdig.com/search?q={query}",
-                category: "محرك بحث"
+                rating: 3.7, 
+                ratingCount: 87,
+                speed: "1.6MB/s" 
             },
-            { 
-                name: "YTS", 
+            "YTS": { 
                 url: "https://yts.mx/browse-movies/{query}/all/all/0/latest",
-                category: "أفلام صغيرة الحجم"
+                rating: 4.1, 
+                ratingCount: 182,
+                speed: "2.8MB/s" 
             },
-            { 
-                name: "Rutracker", 
+            "Rutracker": { 
                 url: "https://rutracker.org/forum/tracker.php?nm={query}",
-                category: "محتوى روسي/عالمي"
+                rating: 4.3, 
+                ratingCount: 156,
+                speed: "2.5MB/s" 
             },
-            { 
-                name: "Nyaa", 
+            "Nyaa": { 
                 url: "https://nyaa.si/?q={query}",
-                category: "أنمي/ياباني"
+                rating: 4.7, 
+                ratingCount: 203,
+                speed: "3.5MB/s" 
             }
-        ];
+        };
 
         // بيانات المستخدم
-        let userFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        let userData = JSON.parse(localStorage.getItem('userData')) || {
+            ratings: {},
+            favorites: [],
+            searchHistory: []
+        };
 
-        // تبديل عرض الفلاتر المتقدمة
-        function toggleAdvanced() {
-            const adv = document.getElementById("advancedFilters");
-            adv.classList.toggle("hidden");
+        // تحميل الصفحة
+        window.onload = function() {
+            loadFavorites();
+            const lastSearch = localStorage.getItem('lastSearch');
+            if (lastSearch) {
+                document.getElementById("searchInput").value = lastSearch;
+            }
+        };
+
+        // عرض النجوم
+        function renderStars(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStar;
+            
+            let stars = '';
+            for (let i = 0; i < fullStars; i++) stars += '★';
+            if (halfStar) stars += '½';
+            for (let i = 0; i < emptyStars; i++) stars += '☆';
+            
+            return stars;
         }
-        
-        // البحث السريع
+
+        // البحث
         function search() {
             const query = document.getElementById("searchInput").value.trim();
             if (!query) {
                 alert("الرجاء إدخال كلمة البحث");
                 return;
             }
+            
+            // حفظ تاريخ البحث
+            if (!userData.searchHistory.includes(query)) {
+                userData.searchHistory.push(query);
+                localStorage.setItem('userData', JSON.stringify(userData));
+            }
+            
+            localStorage.setItem('lastSearch', query);
             performSearch(query);
         }
-        
-        // البحث المتقدم
-        function advancedSearch() {
-            const query = document.getElementById("searchInput").value.trim();
-            if (!query) {
-                alert("الرجاء إدخال كلمة البحث");
-                return;
-            }
-            
-            let searchQuery = query;
-            
-            // إضافة الفلاتر إلى كلمة البحث
-            const contentType = document.getElementById("contentType").value;
-            const quality = document.getElementById("quality").value;
-            const year = document.getElementById("year").value;
-            const size = document.getElementById("size").value;
-            
-            if (contentType) searchQuery += " " + contentType;
-            if (quality) searchQuery += " " + quality;
-            if (year) searchQuery += " " + year;
-            if (size) {
-                if (size === "10GB+") searchQuery += " 10GB";
-                else if (size === "5GB-10GB") searchQuery += " 5GB";
-            }
-            
-            performSearch(searchQuery);
-        }
-        
-        // تنفيذ البحث الفعلي
+
+        // تنفيذ البحث
         function performSearch(query) {
             const encodedQuery = encodeURIComponent(query).replace(/%20/g, "+");
             
             let resultHTML = "<h2>نتائج البحث:</h2>";
             
-            sites.forEach(site => {
-                const isFavorite = userFavorites.includes(site.name);
-                const siteUrl = site.url.replace('{query}', encodedQuery);
+            Object.entries(siteData).forEach(([siteName, data]) => {
+                const url = data.url.replace('{query}', encodedQuery);
+                const isFavorite = userData.favorites.includes(siteName);
+                
+                // حساب التقييم النهائي
+                const userRating = userData.ratings[siteName] || 0;
+                const totalRatings = data.ratingCount + (userRating ? 1 : 0);
+                const totalScore = (data.rating * data.ratingCount) + (userRating || 0);
+                const finalRating = totalRatings > 0 ? (totalScore / totalRatings) : 0;
                 
                 resultHTML += `
-                <div class="result-item">
-                    <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
-                            onclick="toggleFavorite('${site.name}')">
-                        ${isFavorite ? '★' : '☆'}
-                    </button>
-                    <div class="site-name">${site.name} <span class="site-category">(${site.category})</span></div>
-                    <a href="${siteUrl}" class="result-link" target="_blank">${query}</a>
+                <div class="result-item ${isFavorite ? 'favorite-item' : ''}" 
+                     data-rating="${finalRating.toFixed(1)}" 
+                     data-name="${siteName}"
+                     data-speed="${parseFloat(data.speed)}">
+                    <div class="site-header">
+                        <div class="site-name">${siteName} 
+                            <span class="site-status" id="status-${siteName}">جاري التحقق...</span>
+                        </div>
+                        <button class="favorite-toggle" onclick="toggleFavorite('${siteName}')">
+                            ${isFavorite ? '★' : '☆'}
+                        </button>
+                    </div>
+                    <div class="rating">
+                        <span class="stars">${renderStars(finalRating)}</span>
+                        <span class="rating-count">(${finalRating.toFixed(1)}/5 - ${totalRatings} تقييمات)</span>
+                        <button class="rate-btn" onclick="showRatingForm('${siteName}')">قيم هذا الموقع</button>
+                    </div>
+                    <div id="rating-form-${siteName}" class="rating-form">
+                        <small>اختر تقييمك:</small>
+                        <select id="user-rating-${siteName}">
+                            <option value="5">5 ★★★★★</option>
+                            <option value="4">4 ★★★★☆</option>
+                            <option value="3">3 ★★★☆☆</option>
+                            <option value="2">2 ★★☆☆☆</option>
+                            <option value="1">1 ★☆☆☆☆</option>
+                        </select>
+                        <button onclick="submitRating('${siteName}')">حفظ</button>
+                    </div>
+                    <div class="site-stats">
+                        <div class="stat">⏱️ ${data.speed}</div>
+                        <div class="stat">📊 ~${Math.floor(data.ratingCount * 1.5)} نتيجة</div>
+                    </div>
+                    <a href="${url}" class="result-link" target="_blank">${query}</a>
                 </div>`;
             });
             
             document.getElementById("results").innerHTML = resultHTML;
-            updateFavoritesBar();
+            
+            // التحقق من حالة المواقع
+            Object.keys(siteData).forEach(siteName => {
+                checkSiteStatus(siteName, siteData[siteName].url.replace('{query}', 'test'));
+            });
+            
+            // تطبيق الفلاتر الحالية
+            filterByRating();
         }
-        
+
+        // التحقق من حالة الموقع
+        async function checkSiteStatus(siteName, baseUrl) {
+            const statusElement = document.getElementById(`status-${siteName}`);
+            try {
+                // استخدام خدمة CORS proxy للتحقق من حالة الموقع
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(baseUrl)}`;
+                const response = await fetch(proxyUrl);
+                
+                if (response.ok) {
+                    statusElement.textContent = "🟢 متصل";
+                    statusElement.classList.add("online");
+                } else {
+                    statusElement.textContent = "🔴 غير متصل";
+                    statusElement.classList.add("offline");
+                }
+            } catch (error) {
+                statusElement.textContent = "🔴 غير متصل";
+                statusElement.classList.add("offline");
+            }
+        }
+
+        // تصفية حسب التقييم
+        function filterByRating() {
+            const minRating = parseFloat(document.getElementById("ratingFilter").value);
+            const items = document.querySelectorAll(".result-item");
+            
+            items.forEach(item => {
+                const itemRating = parseFloat(item.getAttribute("data-rating"));
+                item.style.display = itemRating >= minRating ? "block" : "none";
+            });
+        }
+
+        // ترتيب النتائج
+        function sortResults() {
+            const sortBy = document.getElementById("sortBy").value;
+            const container = document.getElementById("results");
+            const items = Array.from(document.querySelectorAll(".result-item"));
+            
+            items.sort((a, b) => {
+                if (sortBy === "rating") {
+                    return parseFloat(b.getAttribute("data-rating")) - parseFloat(a.getAttribute("data-rating"));
+                } else if (sortBy === "name") {
+                    return a.getAttribute("data-name").localeCompare(b.getAttribute("data-name"));
+                }
+                return 0;
+            });
+            
+            items.forEach(item => container.appendChild(item));
+        }
+
         // إدارة المفضلة
         function toggleFavorite(siteName) {
-            const index = userFavorites.indexOf(siteName);
+            const index = userData.favorites.indexOf(siteName);
             if (index === -1) {
-                userFavorites.push(siteName);
+                userData.favorites.push(siteName);
             } else {
-                userFavorites.splice(index, 1);
+                userData.favorites.splice(index, 1);
             }
             
-            localStorage.setItem('favorites', JSON.stringify(userFavorites));
-            updateFavoritesBar();
+            localStorage.setItem('userData', JSON.stringify(userData));
+            document.querySelector(`.result-item[data-name="${siteName}"]`).classList.toggle('favorite-item');
+            loadFavorites();
+        }
+
+        function loadFavorites() {
+            const favoritesList = document.getElementById("favorites-list");
+            favoritesList.innerHTML = '';
             
-            // تحديث الأزرار
-            const buttons = document.querySelectorAll('.favorite-btn');
-            buttons.forEach(btn => {
-                if (btn.textContent.includes('★') || btn.textContent.includes('☆')) {
-                    const btnSiteName = btn.getAttribute('onclick').replace("toggleFavorite('", "").replace("')", "");
-                    if (btnSiteName === siteName) {
-                        btn.classList.toggle('active');
-                        btn.innerHTML = userFavorites.includes(siteName) ? '★' : '☆';
-                    }
-                }
+            userData.favorites.forEach(siteName => {
+                const favElement = document.createElement('div');
+                favElement.className = 'favorite-tag';
+                favElement.innerHTML = `
+                    ${siteName}
+                    <button onclick="removeFavorite('${siteName}')">✕</button>
+                `;
+                favoritesList.appendChild(favElement);
             });
         }
-        
-        // تحديث شريط المفضلة
-        function updateFavoritesBar() {
-            const favoritesBar = document.getElementById("favoritesBar");
-            const favoritesList = document.getElementById("favoritesList");
-            
-            if (userFavorites.length > 0) {
-                favoritesBar.classList.remove("hidden");
-                favoritesList.innerHTML = '';
-                
-                userFavorites.forEach(siteName => {
-                    const site = sites.find(s => s.name === siteName);
-                    if (site) {
-                        const favElement = document.createElement('div');
-                        favElement.className = 'favorite-tag';
-                        favElement.innerHTML = `
-                            ${siteName}
-                            <button onclick="removeFavorite('${siteName}')">✕</button>
-                        `;
-                        favoritesList.appendChild(favElement);
-                    }
-                });
-            } else {
-                favoritesBar.classList.add("hidden");
-            }
-        }
-        
-        // إزالة من المفضلة
+
         function removeFavorite(siteName) {
-            userFavorites = userFavorites.filter(name => name !== siteName);
-            localStorage.setItem('favorites', JSON.stringify(userFavorites));
-            updateFavoritesBar();
-            
-            // تحديث الأزرار في النتائج
-            const buttons = document.querySelectorAll('.favorite-btn');
-            buttons.forEach(btn => {
-                if (btn.getAttribute('onclick') === `toggleFavorite('${siteName}')`) {
-                    btn.classList.remove('active');
-                    btn.innerHTML = '☆';
-                }
+            userData.favorites = userData.favorites.filter(name => name !== siteName);
+            localStorage.setItem('userData', JSON.stringify(userData));
+            loadFavorites();
+            document.querySelector(`.result-item[data-name="${siteName}"]`).classList.remove('favorite-item');
+        }
+
+        function toggleFavorites() {
+            document.getElementById("favorites-list").classList.toggle("hidden");
+        }
+
+        // نظام التقييم
+        function showRatingForm(siteName) {
+            document.querySelectorAll(".rating-form").forEach(form => {
+                form.classList.remove("active");
             });
+            const form = document.getElementById(`rating-form-${siteName}`);
+            form.classList.add("active");
+            
+            if (userData.ratings[siteName]) {
+                document.getElementById(`user-rating-${siteName}`).value = userData.ratings[siteName];
+            }
         }
-        
-        // إعادة ضبط الفلاتر
-        function resetFilters() {
-            document.getElementById("contentType").value = "";
-            document.getElementById("quality").value = "";
-            document.getElementById("year").value = "";
-            document.getElementById("size").value = "";
+
+        function submitRating(siteName) {
+            const rating = parseInt(document.getElementById(`user-rating-${siteName}`).value);
+            userData.ratings[siteName] = rating;
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            alert(`تم حفظ تقييمك ${rating} نجوم لموقع ${siteName}`);
+            document.getElementById(`rating-form-${siteName}`).classList.remove("active");
+            
+            // إعادة تحميل النتائج لتحديث التقييمات
+            search();
         }
-        
+
+        // الاقتراحات
+        function applySuggestion(text) {
+            const input = document.getElementById("searchInput");
+            input.value = input.value ? `${input.value} ${text}` : text;
+            input.focus();
+        }
+
         // البحث بالضغط على Enter
         document.getElementById("searchInput").addEventListener("keyup", function(event) {
             if (event.key === "Enter") {
                 search();
             }
         });
-        
-        // تحميل المفضلة عند البدء
-        window.onload = function() {
-            updateFavoritesBar();
-            const lastSearch = localStorage.getItem('lastSearch');
-            if (lastSearch) {
-                document.getElementById("searchInput").value = lastSearch;
-            }
-        };
     </script>
 </body>
 </html>
