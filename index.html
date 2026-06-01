@@ -1,1009 +1,430 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="htmlElement">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REMUX Search Hub - البحث السريع</title>
+    <title>محرك بحث التورنت الموحد</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --primary-color: #00b894;
-            --secondary-color: #6c5ce7;
-            --accent-color: #81ecec;
-            --dark-bg: #111;
-            --card-bg: #1e1e1e;
-            --text-color: #eee;
-            --light-text: #b2bec3;
+            --bg-color: #121214;
+            --card-bg: #1a1a1e;
+            --accent-color: #3498db;
+            --text-color: #e1e1e6;
+            --text-muted: #a8a8b3;
+            --border-color: #29292e;
+            
+            /* ألوان المجموعات للكلمات المفتاحية */
+            --color-premium: #f39c12;
+            --color-standard: #3498db;
+            --color-tech: #9b59b6;
         }
-        
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: var(--dark-bg);
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
             color: var(--text-color);
-            text-align: center;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            transition: all 0.3s;
-        }
-        
-        body.light-mode {
-            --dark-bg: #f5f6fa;
-            --card-bg: #ffffff;
-            --text-color: #2d3436;
-            --light-text: #636e72;
-            background-color: var(--dark-bg);
-            color: var(--text-color);
-        }
-        
-        .search-container {
-            background-color: var(--card-bg);
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        
-        input[type="text"] {
-            padding: 12px;
-            width: 70%;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #555;
-            margin: 10px 0;
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            transition: all 0.3s;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 5px rgba(0, 184, 148, 0.5);
-        }
-        
-        button {
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: none;
-            background-color: var(--primary-color);
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            margin: 10px 5px;
-        }
-        
-        button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .results {
-            margin-top: 30px;
-            text-align: right;
-        }
-        
-        .result-item {
-            background-color: var(--card-bg);
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 8px;
-            transition: all 0.3s;
-            position: relative;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .result-item:hover {
-            transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .site-name {
-            color: var(--primary-color);
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .result-link {
-            color: var(--accent-color);
-            text-decoration: none;
-            display: block;
-            margin-top: 8px;
-            word-break: break-all;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .site-category {
-            color: #fdcb6e;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        
-        /* أنماط المفضلة */
-        .favorite-btn {
-            position: absolute;
-            left: 15px;
-            top: 15px;
-            background: none;
-            border: none;
-            color: var(--light-text);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .favorite-btn.active {
-            color: #fdcb6e;
-        }
-        
-        .favorites-bar {
-            background-color: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: right;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .favorite-tag {
-            display: inline-block;
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            margin: 5px;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        
-        .favorite-tag:hover {
-            transform: scale(1.05);
-        }
-        
-        .favorite-tag button {
-            background: none;
-            border: none;
-            color: white;
-            margin-right: 5px;
+            margin: 0;
             padding: 0;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        
-        /* أنماط جديدة */
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--secondary-color);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-        }
-        
-        .language-toggle {
-            position: fixed;
-            bottom: 80px;
-            left: 20px;
-            background: var(--primary-color);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
             justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-            font-weight: bold;
+            min-height: 100vh;
         }
-        
-        .search-history {
-            background-color: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: right;
+
+        .container {
+            width: 100%;
+            max-width: 750px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
         }
-        
-        .history-item {
-            display: inline-block;
-            margin: 5px;
-            padding: 5px 10px;
-            background-color: #333;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        h1 {
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 5px;
         }
-        
-        .history-item:hover {
-            background-color: var(--primary-color);
-        }
-        
-        .sort-options {
-            margin: 15px 0;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-            transform: translateX(200%);
-            transition: transform 0.3s;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .quality-filters {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .quality-filter {
-            padding: 8px 15px;
-            background-color: #333;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-        
-        .quality-filter:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        /* زر فلترة المفضلة */
-        .filter-favorites {
-            background-color: #fdcb6e;
-            color: #2d3436;
+
+        h1 i {
+            color: var(--accent-color);
             margin-left: 10px;
         }
-        
-        .filter-favorites.active {
-            background-color: #e17055;
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+
+        /* صندوق البحث والمكونات الملحقة به */
+        .search-area {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 6px 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-box:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 20px rgba(52, 152, 219, 0.2);
+        }
+
+        .search-box input {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 12px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .search-row button {
+            border: none;
             color: white;
+            padding: 14px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
         }
-        
-        /* شريط التقدم */
-        .progress-bar {
-            height: 4px;
-            background-color: var(--primary-color);
-            width: 0;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            border-radius: 0 0 10px 10px;
-            transition: width 0.3s;
+
+        .btn-search { background: var(--accent-color); }
+        .btn-search:hover { background: #2980b9; }
+
+        .year-select {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 12px;
+            border-radius: 25px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
         }
-        
-        /* اقتراحات البحث */
-        .suggestions {
-            position: absolute;
-            width: 70%;
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: var(--card-bg);
-            border: 1px solid #555;
-            border-radius: 0 0 5px 5px;
-            z-index: 10;
-            text-align: right;
+
+        /* مجموعات الأوسمة والكلمات المفتاحية الملونة */
+        .tags-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 5px;
+            padding: 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 15px;
+        }
+
+        .search-tag {
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            direction: ltr;
+            background: var(--card-bg);
+        }
+
+        /* ألوان مخصصة لكل فئة */
+        .tag-premium { color: var(--color-premium); border-color: rgba(243, 156, 18, 0.4); }
+        .tag-premium:hover { background: var(--color-premium); color: #fff; }
+
+        .tag-standard { color: var(--color-standard); border-color: rgba(52, 152, 219, 0.4); }
+        .tag-standard:hover { background: var(--color-standard); color: #fff; }
+
+        .tag-tech { color: var(--color-tech); border-color: rgba(155, 89, 182, 0.4); }
+        .tag-tech:hover { background: var(--color-tech); color: #fff; }
+
+        /* خيارات مواقع التورنت */
+        .providers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .provider-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .provider-card:hover {
+            transform: translateY(-3px);
+            border-color: #444;
+        }
+
+        .provider-card input[type="radio"] {
             display: none;
         }
-        
-        .suggestion-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            transition: all 0.2s;
+
+        .provider-card span {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .provider-card input[type="radio"]:checked + span {
+            color: var(--accent-color);
         }
         
-        .suggestion-item:hover {
-            background-color: rgba(0, 184, 148, 0.2);
+        .provider-card:has(input[type="radio"]:checked) {
+            border-color: var(--accent-color);
+            background: rgba(52, 152, 219, 0.05);
         }
-        
-        /* زر مسح التاريخ */
-        .clear-history {
-            background-color: #e17055;
-            color: white;
-            margin-top: 10px;
-        }
-        
-        /* زر التصدير/الاستيراد */
-        .import-export {
-            background-color: #0984e3;
-            color: white;
-            margin: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            input[type="text"] {
-                width: 100%;
-            }
-            
-            button {
-                width: 100%;
-                margin: 5px 0;
-            }
-            
-            .quality-filters {
-                gap: 5px;
-            }
-            
-            .quality-filter {
-                padding: 6px 10px;
-                font-size: 14px;
-            }
-            
-            .suggestions {
-                width: 100%;
-            }
-            
-            .theme-toggle, .language-toggle {
-                bottom: 10px;
-                width: 40px;
-                height: 40px;
-                font-size: 14px;
-            }
-            
-            .language-toggle {
-                bottom: 60px;
-            }
+
+        footer {
+            margin-top: 50px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <div class="theme-toggle" onclick="toggleTheme()">🌓</div>
-    <div class="language-toggle" onclick="toggleLanguage()">EN</div>
-    <div class="notification" id="notification"></div>
-    
-    <h1 id="mainTitle">REMUX Search Hub 🎬 <span id="versionText" style="font-size: 16px; color: var(--accent-color);">(إصدار محسن للجودة)</span></h1>
-    
-    <div class="search-container">
-        <div class="progress-bar" id="progressBar"></div>
-        <input type="text" id="searchInput" placeholder="اكتب اسم الفيلم أو المسلسل..." autofocus>
-        <div class="suggestions" id="suggestions"></div>
-        <button onclick="search()" id="searchBtn">بحث</button>
-        <button id="filterFavoritesBtn" class="filter-favorites" onclick="toggleFavoritesFilter()">عرض المفضلة فقط</button>
-        
-        <div class="quality-filters">
-            <div class="quality-filter" onclick="addToSearch('REMUX')">REMUX</div>
-            <div class="quality-filter" onclick="addToSearch('BluRay')">BluRay</div>
-            <div class="quality-filter" onclick="addToSearch('WEBRip')">WEBRip</div>
-            <div class="quality-filter" onclick="addToSearch('WEBDL')">WEBDL</div>
-            <div class="quality-filter" onclick="addToSearch('2160p')">2160p</div>
-            <div class="quality-filter" onclick="addToSearch('1080p')">1080p</div>
-        </div>
-    </div>
 
-    <div id="searchHistory" class="search-history hidden">
-        <h3 id="historyTitle">عمليات البحث السابقة:</h3>
-        <div id="historyList"></div>
-        <button class="clear-history" onclick="clearSearchHistory()" id="clearHistoryBtn">مسح السجل</button>
-    </div>
+<div class="container">
+    <h1><i class="fa-solid fa-magnet"></i> تورنت فورال</h1>
+    <p class="subtitle">ابحث في أفضل وأقوى مواقع التورنت العالمية من مكان واحد</p>
 
-    <div id="favoritesBar" class="favorites-bar hidden">
-        <h3 id="favoritesTitle">المواقع المفضلة:</h3>
-        <div id="favoritesList"></div>
-        <button class="import-export" onclick="exportFavorites()" id="exportFavoritesBtn">تصدير المفضلة</button>
-        <button class="import-export" onclick="importFavorites()" id="importFavoritesBtn">استيراد المفضلة</button>
-    </div>
-
-    <div class="sort-options hidden" id="sortOptions">
-        <label id="sortLabel">ترتيب النتائج:</label>
-        <select id="sortBy" onchange="sortResults()">
-            <option value="default">الافتراضي</option>
-            <option value="name">حسب الاسم (أ-ي)</option>
-            <option value="category">حسب التصنيف</option>
-            <option value="rating">حسب التقييم</option>
-        </select>
-    </div>
-
-    <div class="results" id="results"></div>
-
-    <script>
-        // بيانات المواقع (تم تحديثها بإزالة الموقعين المطلوبين)
-        const sites = [
-            { 
-                name: "1337x", 
-                url: "https://1337x.to/search/{query}/1/",
-                category: "عام",
-                rating: 4
-            },
-            { 
-                name: "RARBG Mirror", 
-                url: "https://rargb.to/search/?search={query}",
-                category: "عام",
-                rating: 5
-            },
-            { 
-                name: "Rutracker", 
-                url: "https://rutracker.org/forum/tracker.php?nm={query}",
-                category: "محتوى روسي/عالمي",
-                rating: 4
-            },
-            { 
-                name: "Nyaa", 
-                url: "https://nyaa.si/?q={query}",
-                category: "أنمي/ياباني",
-                rating: 5
-            },
-            { 
-                name: "BTDig", 
-                url: "https://btdig.com/search?q={query}",
-                category: "محرك بحث DHT",
-                rating: 4
-            },
-            { 
-                name: "LimeTorrents", 
-                url: "https://www.limetorrents.to/search/all/{query}/",
-                category: "عام",
-                rating: 4
-            },
-            { 
-                name: "The Pirate Bay", 
-                url: "https://thepiratebay.org/search/{query}/0/99/0",
-                category: "أقدم موقع",
-                rating: 3
-            },
-            { 
-                name: "EZTV", 
-                url: "https://eztv.re/search/{query}",
-                category: "مسلسلات تلفزيونية",
-                rating: 4
-            }
-        ];
-
-        // اقتراحات البحث الشائعة
-        const searchSuggestions = [
-            "The Matrix",
-            "Breaking Bad",
-            "Game of Thrones",
-            "Inception",
-            "Stranger Things",
-            "Avengers",
-            "The Witcher",
-            "Interstellar",
-            "Peaky Blinders",
-            "The Mandalorian"
-        ];
-
-        // بيانات الترجمة
-        const translations = {
-            en: {
-                title: "REMUX Search Hub 🎬",
-                version: "(Enhanced Quality Version)",
-                searchPlaceholder: "Enter movie or series name...",
-                searchBtn: "Search",
-                filterFavorites: "Show Favorites Only",
-                showAll: "Show All Results",
-                historyTitle: "Search History:",
-                clearHistory: "Clear History",
-                favoritesTitle: "Favorite Sites:",
-                exportFavorites: "Export Favorites",
-                importFavorites: "Import Favorites",
-                sortLabel: "Sort Results:",
-                sortOptions: {
-                    default: "Default",
-                    name: "By Name (A-Z)",
-                    category: "By Category",
-                    rating: "By Rating"
-                },
-                notifications: {
-                    emptySearch: "Please enter a search term",
-                    addedToFavorites: "Added {site} to favorites",
-                    removedFromFavorites: "Removed {site} from favorites",
-                    historyCleared: "Search history cleared",
-                    favoritesExported: "Favorites exported to clipboard",
-                    favoritesImported: "Favorites imported successfully",
-                    noFavorites: "No favorites to display. Add some sites to favorites first."
-                }
-            },
-            ar: {
-                title: "REMUX Search Hub 🎬",
-                version: "(إصدار محسن للجودة)",
-                searchPlaceholder: "اكتب اسم الفيلم أو المسلسل...",
-                searchBtn: "بحث",
-                filterFavorites: "عرض المفضلة فقط",
-                showAll: "عرض جميع النتائج",
-                historyTitle: "عمليات البحث السابقة:",
-                clearHistory: "مسح السجل",
-                favoritesTitle: "المواقع المفضلة:",
-                exportFavorites: "تصدير المفضلة",
-                importFavorites: "استيراد المفضلة",
-                sortLabel: "ترتيب النتائج:",
-                sortOptions: {
-                    default: "الافتراضي",
-                    name: "حسب الاسم (أ-ي)",
-                    category: "حسب التصنيف",
-                    rating: "حسب التقييم"
-                },
-                notifications: {
-                    emptySearch: "الرجاء إدخال كلمة البحث",
-                    addedToFavorites: "تمت إضافة {site} إلى المفضلة",
-                    removedFromFavorites: "تمت إزالة {site} من المفضلة",
-                    historyCleared: "تم مسح سجل البحث",
-                    favoritesExported: "تم تصدير المفضلة إلى الحافظة",
-                    favoritesImported: "تم استيراد المفضلة بنجاح",
-                    noFavorites: "لا توجد مواقع مفضلة لعرضها. قم بإضافة بعض المواقع إلى المفضلة أولاً."
-                }
-            }
-        };
-
-        // بيانات المستخدم
-        let userFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-        let currentResults = [];
-        let showOnlyFavorites = false;
-        let currentLanguage = localStorage.getItem('language') || 'ar';
-
-        // تبديل الوضع الليلي/النهاري
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-            localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-        }
-
-        // تبديل اللغة
-        function toggleLanguage() {
-            currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
-            localStorage.setItem('language', currentLanguage);
-            applyLanguage();
-            
-            // تغيير اتجاه الصفحة حسب اللغة
-            document.getElementById('htmlElement').dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
-            document.getElementById('htmlElement').lang = currentLanguage;
-        }
-
-        // تطبيق اللغة المحددة
-        function applyLanguage() {
-            const lang = translations[currentLanguage];
-            
-            // تحديث عناصر الواجهة
-            document.getElementById('mainTitle').innerHTML = `${lang.title} <span id="versionText" style="font-size: 16px; color: var(--accent-color);">${lang.version}</span>`;
-            document.getElementById('searchInput').placeholder = lang.searchPlaceholder;
-            document.getElementById('searchBtn').textContent = lang.searchBtn;
-            document.getElementById('filterFavoritesBtn').textContent = showOnlyFavorites ? lang.showAll : lang.filterFavorites;
-            document.getElementById('historyTitle').textContent = lang.historyTitle;
-            document.getElementById('clearHistoryBtn').textContent = lang.clearHistory;
-            document.getElementById('favoritesTitle').textContent = lang.favoritesTitle;
-            document.getElementById('exportFavoritesBtn').textContent = lang.exportFavorites;
-            document.getElementById('importFavoritesBtn').textContent = lang.importFavorites;
-            document.getElementById('sortLabel').textContent = lang.sortLabel;
-            
-            // تحديث خيارات الفرز
-            const sortBy = document.getElementById('sortBy');
-            sortBy.options[0].text = lang.sortOptions.default;
-            sortBy.options[1].text = lang.sortOptions.name;
-            sortBy.options[2].text = lang.sortOptions.category;
-            sortBy.options[3].text = lang.sortOptions.rating;
-        }
-
-        // إظهار الإشعارات
-        function showNotification(message) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
+    <form id="searchForm" onsubmit="executeSearch(event)">
         
-        // إضافة نص للبحث
-        function addToSearch(text) {
-            const searchInput = document.getElementById('searchInput');
-            const currentValue = searchInput.value.trim();
-            
-            if (currentValue.includes(text)) {
-                searchInput.value = currentValue.replace(text, '').trim();
-            } else {
-                searchInput.value = currentValue ? `${currentValue} ${text}` : text;
-            }
-            
-            if (searchInput.value.trim()) {
-                search();
-            }
-        }
-        
-        // البحث السريع
-        function search() {
-            const query = document.getElementById("searchInput").value.trim();
-            const lang = translations[currentLanguage];
-            
-            if (!query) {
-                showNotification(lang.notifications.emptySearch);
-                return;
-            }
-            
-            // إظهار شريط التقدم
-            const progressBar = document.getElementById('progressBar');
-            progressBar.style.width = '0';
-            progressBar.style.display = 'block';
-            
-            // محاكاة التقدم
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 10;
-                progressBar.style.width = `${progress}%`;
-                
-                if (progress >= 100) {
-                    clearInterval(progressInterval);
-                    progressBar.style.display = 'none';
-                }
-            }, 50);
-            
-            // حفظ في سجل البحث
-            if (!searchHistory.includes(query)) {
-                searchHistory.unshift(query);
-                if (searchHistory.length > 10) searchHistory.pop();
-                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-                updateSearchHistory();
-            }
-            
-            // إخفاء اقتراحات البحث
-            document.getElementById('suggestions').style.display = 'none';
-            
-            // تنفيذ البحث بعد تأخير بسيط لإظهار شريط التقدم
-            setTimeout(() => {
-                performSearch(query);
-            }, 300);
-        }
-        
-        // تنفيذ البحث الفعلي
-        function performSearch(query) {
-            const encodedQuery = encodeURIComponent(query).replace(/%20/g, "+");
-            const lang = translations[currentLanguage];
-            
-            let resultHTML = `<h2>${lang.searchResults || 'نتائج البحث عن'}: "${query}"</h2>`;
-            
-            currentResults = sites.map(site => {
-                const isFavorite = userFavorites.includes(site.name);
-                let siteUrl = site.url.replace('{query}', encodedQuery);
-                
-                return {
-                    html: `
-                    <div class="result-item">
-                        <button class="favorite-btn ${isFavorite ? 'active' : ''}" 
-                                onclick="toggleFavorite('${site.name}')">
-                            ${isFavorite ? '★' : '☆'}
-                        </button>
-                        <div class="site-name">${site.name} 
-                            <span class="site-category">(${site.category})</span>
-                            <span class="site-rating">${'★'.repeat(site.rating)}${'☆'.repeat(5 - site.rating)}</span>
-                        </div>
-                        <a href="${siteUrl}" class="result-link" target="_blank">${query}</a>
-                    </div>`,
-                    name: site.name,
-                    category: site.category,
-                    rating: site.rating,
-                    isFavorite: isFavorite
-                };
-            });
-            
-            displayResults();
-            document.getElementById("sortOptions").classList.remove("hidden");
-            updateFavoritesBar();
-            
-            localStorage.setItem('lastSearch', query);
-        }
-        
-        // عرض النتائج مع تطبيق الفلترة
-        function displayResults() {
-            const resultsContainer = document.getElementById("results");
-            const lang = translations[currentLanguage];
-            
-            if (showOnlyFavorites) {
-                const filteredResults = currentResults.filter(result => result.isFavorite);
-                if (filteredResults.length === 0) {
-                    resultsContainer.innerHTML = `<p>${lang.notifications.noFavorites}</p>`;
-                } else {
-                    resultsContainer.innerHTML = currentResults[0].html.includes('<h2>') ? 
-                        currentResults[0].html.split('<h2>')[0] + '<h2>' + currentResults[0].html.split('<h2>')[1].split('</h2>')[0] + ` (${lang.filteredResults || 'المفضلة فقط'})</h2>` + 
-                        filteredResults.map(r => r.html).join('') : 
-                        `<h2>${lang.results} (${lang.filteredResults || 'المفضلة فقط'})</h2>` + filteredResults.map(r => r.html).join('');
-                }
-            } else {
-                resultsContainer.innerHTML = currentResults.map(r => r.html).join('');
-            }
-        }
-        
-        // تبديل فلترة المفضلة
-        function toggleFavoritesFilter() {
-            const filterBtn = document.getElementById('filterFavoritesBtn');
-            const lang = translations[currentLanguage];
-            
-            showOnlyFavorites = !showOnlyFavorites;
-            
-            if (showOnlyFavorites) {
-                filterBtn.textContent = lang.showAll;
-                filterBtn.classList.add('active');
-            } else {
-                filterBtn.textContent = lang.filterFavorites;
-                filterBtn.classList.remove('active');
-            }
-            
-            displayResults();
-        }
-        
-        // ترتيب النتائج
-        function sortResults() {
-            const sortBy = document.getElementById("sortBy").value;
-            
-            let sortedResults = [...currentResults];
-            
-            switch(sortBy) {
-                case 'name':
-                    sortedResults.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'category':
-                    sortedResults.sort((a, b) => a.category.localeCompare(b.category));
-                    break;
-                case 'rating':
-                    sortedResults.sort((a, b) => b.rating - a.rating);
-                    break;
-                default:
-                    // الترتيب الافتراضي
-                    break;
-            }
-            
-            currentResults = sortedResults;
-            displayResults();
-        }
-        
-        // إدارة المفضلة
-        function toggleFavorite(siteName) {
-            const lang = translations[currentLanguage];
-            const index = userFavorites.indexOf(siteName);
-            
-            if (index === -1) {
-                userFavorites.push(siteName);
-                showNotification(lang.notifications.addedToFavorites.replace('{site}', siteName));
-            } else {
-                userFavorites.splice(index, 1);
-                showNotification(lang.notifications.removedFromFavorites.replace('{site}', siteName));
-            }
-            
-            localStorage.setItem('favorites', JSON.stringify(userFavorites));
-            updateFavoritesBar();
-            
-            // تحديث حالة المفضلة في currentResults
-            currentResults.forEach(result => {
-                if (result.name === siteName) {
-                    result.isFavorite = !result.isFavorite;
-                }
-            });
-            
-            // إذا كان فلتر المفضلة مفعل، قم بتحديث العرض
-            if (showOnlyFavorites) {
-                displayResults();
-            }
-            
-            // تحديث الأزرار
-            const buttons = document.querySelectorAll('.favorite-btn');
-            buttons.forEach(btn => {
-                if (btn.textContent.includes('★') || btn.textContent.includes('☆')) {
-                    const btnSiteName = btn.getAttribute('onclick').replace("toggleFavorite('", "").replace("')", "");
-                    if (btnSiteName === siteName) {
-                        btn.classList.toggle('active');
-                        btn.innerHTML = userFavorites.includes(siteName) ? '★' : '☆';
-                    }
-                }
-            });
-        }
-        
-        // تحديث شريط المفضلة
-        function updateFavoritesBar() {
-            const favoritesBar = document.getElementById("favoritesBar");
-            const favoritesList = document.getElementById("favoritesList");
-            
-            if (userFavorites.length > 0) {
-                favoritesBar.classList.remove("hidden");
-                favoritesList.innerHTML = '';
-                
-                userFavorites.forEach(siteName => {
-                    const site = sites.find(s => s.name === siteName);
-                    if (site) {
-                        const favElement = document.createElement('div');
-                        favElement.className = 'favorite-tag';
-                        favElement.innerHTML = `
-                            ${siteName}
-                            <button onclick="removeFavorite('${siteName}')">✕</button>
-                        `;
-                        favoritesList.appendChild(favElement);
-                    }
-                });
-            } else {
-                favoritesBar.classList.add("hidden");
-            }
-        }
-        
-        // تحديث سجل البحث
-        function updateSearchHistory() {
-            const historyContainer = document.getElementById("searchHistory");
-            const historyList = document.getElementById("historyList");
-            
-            if (searchHistory.length > 0) {
-                historyContainer.classList.remove("hidden");
-                historyList.innerHTML = '';
-                
-                searchHistory.forEach(query => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.textContent = query;
-                    historyItem.onclick = () => {
-                        document.getElementById("searchInput").value = query;
-                        search();
-                    };
-                    historyList.appendChild(historyItem);
-                });
-            } else {
-                historyContainer.classList.add("hidden");
-            }
-        }
-        
-        // مسح سجل البحث
-        function clearSearchHistory() {
-            const lang = translations[currentLanguage];
-            searchHistory = [];
-            localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-            updateSearchHistory();
-            showNotification(lang.notifications.historyCleared);
-        }
-        
-        // تصدير المفضلة
-        function exportFavorites() {
-            const lang = translations[currentLanguage];
-            navigator.clipboard.writeText(JSON.stringify(userFavorites))
-                .then(() => {
-                    showNotification(lang.notifications.favoritesExported);
-                })
-                .catch(err => {
-                    console.error('Failed to copy favorites: ', err);
-                });
-        }
-        
-        // استيراد المفضلة
-        function importFavorites() {
-            const lang = translations[currentLanguage];
-            const input = prompt(lang.importPrompt || "الصق بيانات المفضلة هنا:");
-            
-            if (input) {
-                try {
-                    const importedFavorites = JSON.parse(input);
-                    if (Array.isArray(importedFavorites)) {
-                        userFavorites = importedFavorites.filter(name => 
-                            sites.some(site => site.name === name)
-                        );
-                        localStorage.setItem('favorites', JSON.stringify(userFavorites));
-                        updateFavoritesBar();
-                        showNotification(lang.notifications.favoritesImported);
-                        
-                        // إذا كان هناك نتائج معروضة، قم بتحديثها
-                        if (currentResults.length > 0) {
-                            currentResults.forEach(result => {
-                                result.isFavorite = userFavorites.includes(result.name);
-                            });
-                            displayResults();
+        <div class="search-area">
+            <div class="search-row">
+                <select id="yearSelect" class="year-select" onchange="appendYear()">
+                    <option value="">السنة</option>
+                    <script>
+                        // توليد السنوات ديناميكياً من السنة الحالية ونزولاً لـ 15 سنة سابقة
+                        const currentYear = new Date().getFullYear();
+                        for(let y = currentYear; y >= currentYear - 15; y--) {
+                            document.write(`<option value="${y}">${y}</option>`);
                         }
-                    } else {
-                        alert(lang.importError || "بيانات غير صالحة. يجب أن تكون المفضلة مصفوفة من أسماء المواقع.");
-                    }
-                } catch (e) {
-                    alert(lang.importError || "بيانات غير صالحة. يرجى التأكد من صحة البيانات المنسوخة.");
-                }
-            }
-        }
-        
-        // إزالة من المفضلة
-        function removeFavorite(siteName) {
-            const lang = translations[currentLanguage];
-            userFavorites = userFavorites.filter(name => name !== siteName);
-            localStorage.setItem('favorites', JSON.stringify(userFavorites));
-            updateFavoritesBar();
-            showNotification(lang.notifications.removedFromFavorites.replace('{site}', siteName));
-            
-            // تحديث حالة المفضلة في currentResults
-            currentResults.forEach(result => {
-                if (result.name === siteName) {
-                    result.isFavorite = false;
-                }
-            });
-            
-            // إذا كان فلتر المفضلة مفعل، قم بتحديث العرض
-            if (showOnlyFavorites) {
-                displayResults();
-            }
-            
-            // تحديث الأزرار في النتائج
-            const buttons = document.querySelectorAll('.favorite-btn');
-            buttons.forEach(btn => {
-                if (btn.getAttribute('onclick') === `toggleFavorite('${siteName}')`) {
-                    btn.classList.remove('active');
-                    btn.innerHTML = '☆';
-                }
-            });
-        }
-        
-        // البحث بالضغط على Enter
-        document.getElementById("searchInput").addEventListener("keyup", function(event) {
-            if (event.key === "Enter") {
-                search();
-            }
-        });
-        
-        // عرض اقتراحات البحث
-        document.getElementById("searchInput").addEventListener("input", function(e) {
-            const input = e.target.value.toLowerCase();
-            const suggestionsContainer = document.getElementById("suggestions");
-            
-            if (input.length > 1) {
-                const filtered = searchSuggestions.filter(item => 
-                    item.toLowerCase().includes(input)
-                );
+                    </script>
+                </select>
+
+                <div class="search-box">
+                    <input type="text" id="searchQuery" placeholder="اكتب اسم الفيلم، اللعبة، أو البرنامج..." required autocomplete="off">
+                    <i class="fa-solid fa-circle-xmark" id="clearBtn" style="cursor:pointer; color:var(--text-muted); margin: 0 10px; display:none; font-size: 1.2rem;"></i>
+                </div>
+
+                <button type="submit" class="btn-search"><i class="fa-solid fa-magnifying-glass"></i> ابحث الآن</button>
+            </div>
+
+            <div class="tags-group">
+                <div class="search-tag tag-premium" onclick="appendTag('REMUX')">REMUX</div>
+                <div class="search-tag tag-premium" onclick="appendTag('2160p')">2160p (4K)</div>
+                <div class="search-tag tag-premium" onclick="appendTag('BluRay')">BluRay</div>
                 
-                if (filtered.length > 0) {
-                    suggestionsContainer.innerHTML = filtered.map(item => 
-                        `<div class="suggestion-item" onclick="selectSuggestion('${item}')">${item}</div>`
-                    ).join('');
-                    suggestionsContainer.style.display = 'block';
-                } else {
-                    suggestionsContainer.style.display = 'none';
-                }
-            } else {
-                suggestionsContainer.style.display = 'none';
-            }
-        });
-        
-        // اختيار اقتراح
-        function selectSuggestion(suggestion) {
-            document.getElementById("searchInput").value = suggestion;
-            document.getElementById("suggestions").style.display = 'none';
-            search();
-        }
-        
-        // تحميل المفضلة عند البدء
-        window.onload = function() {
-            // تحميل الوضع المفضل
-            if (localStorage.getItem('theme') === 'light') {
-                document.body.classList.add('light-mode');
-            }
-            
-            // تطبيق اللغة المحددة
-            applyLanguage();
-            
-            // تحميل اتجاه النص بناءً على اللغة
-            document.getElementById('htmlElement').dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
-            document.getElementById('htmlElement').lang = currentLanguage;
-            
-            updateFavoritesBar();
-            updateSearchHistory();
-            
-            const lastSearch = localStorage.getItem('lastSearch');
-            if (lastSearch) {
-                document.getElementById("searchInput").value = lastSearch;
-            }
-        };
-    </script>
+                <div class="search-tag tag-standard" onclick="appendTag('1080p')">1080p</div>
+                <div class="search-tag tag-standard" onclick="appendTag('WEB-DL')">WEB-DL</div>
+                <div class="search-tag tag-standard" onclick="appendTag('WEBRip')">WEBRip</div>
+                <div class="search-tag tag-standard" onclick="appendTag('720p')">720p</div>
+                
+                <div class="search-tag tag-tech" onclick="appendTag('HDR')">HDR</div>
+                <div class="search-tag tag-tech" onclick="appendTag('DV')">DV (Dolby)</div>
+                <div class="search-tag tag-tech" onclick="appendTag('Atmos')">Atmos</div>
+                <div class="search-tag tag-tech" onclick="appendTag('10bit')">10bit</div>
+            </div>
+        </div>
+
+        <div class="providers-grid">
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="1337x" checked>
+                <span>1337x</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="thepiratebay">
+                <span>The Pirate Bay</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="rarbg">
+                <span>YTS (أفلام مضغوطة)</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="nyaa">
+                <span>Nyaa (الأنمي)</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="fitgirl">
+                <span>FitGirl (الألعاب)</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="rutracker">
+                <span>RuTracker</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="torrentgalaxy">
+                <span>TorrentGalaxy</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="knaben">
+                <span>Knaben (موحد)</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="rargb_to">
+                <span>RARBG Proxy</span>
+            </label>
+            <label class="provider-card">
+                <input type="radio" name="torrent_site" value="snowfl">
+                <span>Snowfl (مجمع)</span>
+            </label>
+        </div>
+    </form>
+
+    <footer>
+        <p>تنبيه: تأكد دائماً من استخدام VPN لحماية خصوصيتك أثناء التصفح.</p>
+    </footer>
+</div>
+
+<script>
+const queryInput = document.getElementById('searchQuery');
+const clearBtn = document.getElementById('clearBtn');
+
+// التحكم في ظهور وزر الحذف السريع X
+queryInput.addEventListener('input', () => {
+    clearBtn.style.display = queryInput.value.length > 0 ? 'block' : 'none';
+});
+
+clearBtn.addEventListener('click', () => {
+    queryInput.value = '';
+    clearBtn.style.display = 'none';
+    document.getElementById('yearSelect').value = '';
+    queryInput.focus();
+});
+
+// دالة إضافة وسوم الجودة
+function appendTag(tagValue) {
+    let currentText = queryInput.value.trim();
+    if (currentText === "") {
+        queryInput.value = tagValue;
+    } else if (!currentText.includes(tagValue)) {
+        queryInput.value = currentText + " " + tagValue;
+    }
+    clearBtn.style.display = 'block';
+    queryInput.focus();
+}
+
+// دالة إضافة السنة المحددة من القائمة تلقائياً
+function appendYear() {
+    const yearVal = document.getElementById('yearSelect').value;
+    if(!yearVal) return;
+    
+    let currentText = queryInput.value.trim();
+    // إزالة أي سنة سابقة مكونة من 4 أرقام إذا كانت موجودة لمنع التكرار
+    currentText = currentText.replace(/\b(19|20)\d{2}\b/g, '').trim();
+    
+    queryInput.value = currentText === "" ? yearVal : currentText + " " + yearVal;
+    clearBtn.style.display = 'block';
+    queryInput.focus();
+}
+
+// وظيفة البحث الفردي في موقع محدد
+function executeSearch(event) {
+    if(event) event.preventDefault(); 
+    
+    const rawQuery = queryInput.value.trim();
+    if(!rawQuery) return;
+    
+    const query = encodeURIComponent(rawQuery);
+    const selectedSite = document.querySelector('input[name="torrent_site"]:checked').value;
+    
+    let searchUrl = '';
+
+    switch(selectedSite) {
+        case '1337x': 
+            searchUrl = `https://1337x.to/search/${query}/1/`; 
+            break;
+        case 'thepiratebay': 
+            searchUrl = `https://thepiratebay.org/search.php?q=${query}`; 
+            break;
+        case 'rarbg': 
+            const ytsQuery = encodeURIComponent(rawQuery.replace(/\s+/g, '-').toLowerCase());
+            searchUrl = `https://yts.mx/browse-movies/${ytsQuery}/all/all/0/latest/0/all`;
+            break;
+        case 'nyaa': 
+            searchUrl = `https://nyaa.si/?f=0&c=0&q=${query}`; 
+            break;
+        case 'fitgirl': 
+            searchUrl = `https://fitgirl-repacks.site/?s=${query}`; 
+            break;
+        case 'rutracker': 
+            searchUrl = `https://rutracker.org/forum/tracker.php?nm=${query}`; 
+            break;
+        case 'torrentgalaxy': 
+            searchUrl = `https://en.torrentgalaxy-official.is/movies?search=${query}`; 
+            break;
+        case 'knaben': 
+            searchUrl = `https://knaben.org/search/${query}`; 
+            break;
+        case 'rargb_to': 
+            searchUrl = `https://rargb.to/search/?search=${query}`; 
+            break;
+        case 'snowfl': 
+            searchUrl = `https://snowfl.com/#${query}`; 
+            break;
+        default: 
+            searchUrl = `https://google.com/search?q=${query}+torrent`;
+    }
+
+    if(searchUrl) {
+        window.open(searchUrl, '_blank');
+    }
+}
+
+// حفظ واستعادة آخر موقع تم تحديده تلقائياً من الـ LocalStorage
+document.querySelectorAll('input[name="torrent_site"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        localStorage.setItem('saved_torrent_provider', e.target.value);
+    });
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('saved_torrent_provider');
+    if (saved) {
+        const targetRadio = document.querySelector(`input[name="torrent_site"][value="${saved}"]`);
+        if (targetRadio) targetRadio.checked = true;
+    }
+});
+</script>
+
 </body>
 </html>
