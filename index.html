@@ -20,6 +20,7 @@
             --color-premium: #f39c12;
             --color-standard: #3498db;
             --color-tech: #9b59b6;
+            --color-series: #2ecc71;
         }
 
         body {
@@ -37,7 +38,7 @@
 
         .container {
             width: 100%;
-            max-width: 750px;
+            max-width: 850px; /* تم تكبير الحاوية قليلاً لتستوعب المواقع الجديدة بشكل متناسق */
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
@@ -171,12 +172,48 @@
         .tag-tech { color: var(--color-tech); border-color: rgba(155, 89, 182, 0.4); }
         .tag-tech:hover { background: var(--color-tech); color: #fff; }
 
-        /* خيارات مواقع التورنت */
+        .tag-series { color: var(--color-series); border-color: rgba(46, 204, 113, 0.4); }
+        .tag-series:hover { background: var(--color-series); color: #fff; }
+
+        /* أزرار تصفية المواقع الكبرى */
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .filter-btn {
+            background: #1e1e24;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            color: #fff;
+            border-color: #555;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        /* خيارات مواقع التورنت والتحميل */
         .providers-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
             gap: 12px;
-            margin-top: 25px;
         }
 
         .provider-card {
@@ -223,7 +260,7 @@
 <body>
 
 <div class="container">
-    <h1><i class="fa-solid fa-magnet"></i> تورنت فورال</h1>
+    <h1><i class="fa-solid fa-magnet"></i> يونس تورنت</h1>
     <p class="subtitle">ابحث في أفضل وأقوى مواقع التورنت العالمية من مكان واحد</p>
 
     <form id="searchForm" onsubmit="executeSearch(event)">
@@ -233,7 +270,6 @@
                 <select id="yearSelect" class="year-select" onchange="appendYear()">
                     <option value="">السنة</option>
                     <script>
-                        // توليد السنوات ديناميكياً من السنة الحالية ونزولاً لـ 15 سنة سابقة
                         const currentYear = new Date().getFullYear();
                         for(let y = currentYear; y >= currentYear - 15; y--) {
                             document.write(`<option value="${y}">${y}</option>`);
@@ -263,47 +299,71 @@
                 <div class="search-tag tag-tech" onclick="appendTag('DV')">DV (Dolby)</div>
                 <div class="search-tag tag-tech" onclick="appendTag('Atmos')">Atmos</div>
                 <div class="search-tag tag-tech" onclick="appendTag('10bit')">10bit</div>
+
+                <div class="search-tag tag-series" onclick="appendTag('Complete')"><i class="fa-solid fa-box"></i> Complete</div>
+                <div class="search-tag tag-series" onclick="appendTag('S01')">S01</div>
+                <div class="search-tag tag-series" onclick="appendTag('S02')">S02</div>
+                <div class="search-tag tag-series" onclick="appendTag('S03')">S03</div>
+                <div class="search-tag tag-series" onclick="appendTag('S04')">S04</div>
+                <div class="search-tag tag-series" onclick="appendTag('S05')">S05</div>
             </div>
         </div>
 
-        <div class="providers-grid">
-            <label class="provider-card">
+        <div class="filter-container">
+            <button type="button" class="filter-btn active" onclick="filterSites('all', this)"><i class="fa-solid fa-globe"></i> الكل</button>
+            <button type="button" class="filter-btn" onclick="filterSites('movies', this)"><i class="fa-solid fa-film"></i> أفلام ومسلسلات</button>
+            <button type="button" class="filter-btn" onclick="filterSites('games', this)"><i class="fa-solid fa-gamepad"></i> ألعاب وبرامج</button>
+            <button type="button" class="filter-btn" onclick="filterSites('general', this)"><i class="fa-solid fa-box-archive"></i> محركات عامة</button>
+        </div>
+
+        <div class="providers-grid" id="providersGrid">
+            <label class="provider-card" data-category="movies">
                 <input type="radio" name="torrent_site" value="1337x" checked>
                 <span>1337x</span>
             </label>
-            <label class="provider-card">
-                <input type="radio" name="torrent_site" value="thepiratebay">
-                <span>The Pirate Bay</span>
-            </label>
-            <label class="provider-card">
+            <label class="provider-card" data-category="movies">
                 <input type="radio" name="torrent_site" value="rarbg">
                 <span>YTS (أفلام مضغوطة)</span>
             </label>
-            <label class="provider-card">
-                <input type="radio" name="torrent_site" value="nyaa">
-                <span>Nyaa (الأنمي)</span>
-            </label>
-            <label class="provider-card">
-                <input type="radio" name="torrent_site" value="fitgirl">
-                <span>FitGirl (الألعاب)</span>
-            </label>
-            <label class="provider-card">
-                <input type="radio" name="torrent_site" value="rutracker">
-                <span>RuTracker</span>
-            </label>
-            <label class="provider-card">
+            <label class="provider-card" data-category="movies">
                 <input type="radio" name="torrent_site" value="torrentgalaxy">
                 <span>TorrentGalaxy</span>
             </label>
-            <label class="provider-card">
-                <input type="radio" name="torrent_site" value="knaben">
-                <span>Knaben (موحد)</span>
-            </label>
-            <label class="provider-card">
+            <label class="provider-card" data-category="movies">
                 <input type="radio" name="torrent_site" value="rargb_to">
                 <span>RARBG Proxy</span>
             </label>
-            <label class="provider-card">
+
+            <label class="provider-card" data-category="games">
+                <input type="radio" name="torrent_site" value="fitgirl">
+                <span>FitGirl (الألعاب)</span>
+            </label>
+            <label class="provider-card" data-category="games">
+                <input type="radio" name="torrent_site" value="dodi">
+                <span>DODI Repacks</span>
+            </label>
+            <label class="provider-card" data-category="games">
+                <input type="radio" name="torrent_site" value="steamrip">
+                <span>SteamRIP</span>
+            </label>
+            <label class="provider-card" data-category="games">
+                <input type="radio" name="torrent_site" value="rutracker">
+                <span>RuTracker</span>
+            </label>
+            <label class="provider-card" data-category="games">
+                <input type="radio" name="torrent_site" value="thepiratebay">
+                <span>The Pirate Bay</span>
+            </label>
+            <label class="provider-card" data-category="games">
+                <input type="radio" name="torrent_site" value="nyaa">
+                <span>Nyaa (الأنمي)</span>
+            </label>
+
+            <label class="provider-card" data-category="general">
+                <input type="radio" name="torrent_site" value="knaben">
+                <span>Knaben (موحد)</span>
+            </label>
+            <label class="provider-card" data-category="general">
                 <input type="radio" name="torrent_site" value="snowfl">
                 <span>Snowfl (مجمع)</span>
             </label>
@@ -319,6 +379,28 @@
 const queryInput = document.getElementById('searchQuery');
 const clearBtn = document.getElementById('clearBtn');
 
+// دالة تصفية الفئات والبطاقات
+function filterSites(category, buttonElement) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    buttonElement.classList.add('active');
+
+    const cards = document.querySelectorAll('.provider-card');
+    cards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        if (category === 'all' || cardCategory === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    const currentChecked = document.querySelector('input[name="torrent_site"]:checked');
+    if (currentChecked && currentChecked.closest('.provider-card').style.display === 'none') {
+        const firstVisibleRadio = document.querySelector('.provider-card[style*="display: block"] input, .provider-card:not([style*="display: none"]) input');
+        if (firstVisibleRadio) firstVisibleRadio.checked = true;
+    }
+}
+
 // التحكم في ظهور وزر الحذف السريع X
 queryInput.addEventListener('input', () => {
     clearBtn.style.display = queryInput.value.length > 0 ? 'block' : 'none';
@@ -331,7 +413,7 @@ clearBtn.addEventListener('click', () => {
     queryInput.focus();
 });
 
-// دالة إضافة وسوم الجودة
+// دالة إضافة وسوم الجودة والمواسم
 function appendTag(tagValue) {
     let currentText = queryInput.value.trim();
     if (currentText === "") {
@@ -349,7 +431,6 @@ function appendYear() {
     if(!yearVal) return;
     
     let currentText = queryInput.value.trim();
-    // إزالة أي سنة سابقة مكونة من 4 أرقام إذا كانت موجودة لمنع التكرار
     currentText = currentText.replace(/\b(19|20)\d{2}\b/g, '').trim();
     
     queryInput.value = currentText === "" ? yearVal : currentText + " " + yearVal;
@@ -364,45 +445,64 @@ function executeSearch(event) {
     const rawQuery = queryInput.value.trim();
     if(!rawQuery) return;
     
-    const query = encodeURIComponent(rawQuery);
     const selectedSite = document.querySelector('input[name="torrent_site"]:checked').value;
-    
     let searchUrl = '';
 
     switch(selectedSite) {
         case '1337x': 
-            searchUrl = `https://1337x.to/search/${query}/1/`; 
+            searchUrl = `https://1337x.to/search/${encodeURIComponent(rawQuery)}/1/`; 
             break;
+            
         case 'thepiratebay': 
-            searchUrl = `https://thepiratebay.org/search.php?q=${query}`; 
+            searchUrl = `https://thepiratebay.org/search.php?q=${encodeURIComponent(rawQuery)}`; 
             break;
+            
         case 'rarbg': 
             const ytsQuery = encodeURIComponent(rawQuery.replace(/\s+/g, '-').toLowerCase());
-            searchUrl = `https://yts.mx/browse-movies/${ytsQuery}/all/all/0/latest/0/all`;
+            searchUrl = `https://yts.lu/browse-movies/${ytsQuery}/all/all/0/latest/0/all`;
             break;
+            
         case 'nyaa': 
-            searchUrl = `https://nyaa.si/?f=0&c=0&q=${query}`; 
+            const nyaaQuery = encodeURIComponent(rawQuery.replace(/\s+/g, '+'));
+            searchUrl = `https://nyaa.si/?f=0&c=0&q=${nyaaQuery}`; 
             break;
+            
         case 'fitgirl': 
-            searchUrl = `https://fitgirl-repacks.site/?s=${query}`; 
+            searchUrl = `https://fitgirl-repacks.site/?s=${encodeURIComponent(rawQuery)}`; 
             break;
+            
+        case 'dodi': 
+            searchUrl = `https://dodi-repacks.site/?s=${encodeURIComponent(rawQuery)}`; 
+            break;
+            
+        case 'steamrip': 
+            searchUrl = `https://steamrip.com/?s=${encodeURIComponent(rawQuery)}`; 
+            break;
+            
         case 'rutracker': 
-            searchUrl = `https://rutracker.org/forum/tracker.php?nm=${query}`; 
+            const rutrackerQuery = encodeURIComponent(rawQuery.replace(/\s+/g, '.'));
+            searchUrl = `https://rutracker.org/forum/tracker.php?nm=${rutrackerQuery}`; 
             break;
+            
         case 'torrentgalaxy': 
-            searchUrl = `https://en.torrentgalaxy-official.is/movies?search=${query}`; 
+            searchUrl = `https://torrentgalaxy.to/torrents.php?search=${encodeURIComponent(rawQuery)}`; 
             break;
+            
         case 'knaben': 
-            searchUrl = `https://knaben.org/search/${query}`; 
+            const knabenQuery = encodeURIComponent(rawQuery.replace(/\s+/g, '+'));
+            searchUrl = `https://knaben.org/search/${knabenQuery}`; 
             break;
+            
         case 'rargb_to': 
-            searchUrl = `https://rargb.to/search/?search=${query}`; 
+            searchUrl = `https://rargb.to/search/?search=${encodeURIComponent(rawQuery)}`; 
             break;
+            
         case 'snowfl': 
-            searchUrl = `https://snowfl.com/#${query}`; 
+            searchUrl = `https://snowfl.com/#${encodeURIComponent(rawQuery)}`; 
             break;
+            
         default: 
-            searchUrl = `https://google.com/search?q=${query}+torrent`;
+            searchUrl = `https://google.com/search?q=${encodeURIComponent(rawQuery)}+torrent`;
     }
 
     if(searchUrl) {
